@@ -1,5 +1,23 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <html>
+<head>
+    <title>Smart Water Monitoring - Accueil</title>
+</head>
 <body>
-<h2>Hello World!</h2>
+    <h1>Bienvenue sur Smart Water Monitoring</h1>
+
+    <c:if test="${not empty sessionScope.user}">
+        <p>Connecté en tant que : <strong>${sessionScope.user.nom}</strong></p>
+        <p><a href="${pageContext.request.contextPath}/auth?action=logout">Se déconnecter</a></p>
+    </c:if>
+
+    <h2>Gestion</h2>
+    <ul>
+        <li><a href="${pageContext.request.contextPath}/alertes">Gérer les Alertes</a></li>
+        <li><a href="${pageContext.request.contextPath}/utilisateurs">Gérer les Utilisateurs</a></li>
+        <li><a href="${pageContext.request.contextPath}/capteurs">Gérer les Capteurs IoT</a></li>
+    </ul>
+
 </body>
 </html>

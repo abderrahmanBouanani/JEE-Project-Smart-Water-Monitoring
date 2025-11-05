@@ -7,7 +7,7 @@ import java.util.List;
 
 public class UtilisateurService implements IService<Utilisateur> {
 
-    private final UtilisateurDao utilisateurDao = new UtilisateurDao();
+    private UtilisateurDao utilisateurDao = new UtilisateurDao();
 
     @Override
     public boolean create(Utilisateur o) {
@@ -30,7 +30,12 @@ public class UtilisateurService implements IService<Utilisateur> {
     }
 
     @Override
-    public Utilisateur findById(Long id) {
+    public Utilisateur findById(Long id) { // Changé pour Long
         return utilisateurDao.findById(id);
+    }
+
+    // Nouvelle méthode pour l'authentification
+    public Utilisateur findByEmail(String email) {
+        return utilisateurDao.findByEmail(email);
     }
 }

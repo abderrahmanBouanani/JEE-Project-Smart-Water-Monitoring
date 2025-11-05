@@ -64,6 +64,12 @@ public abstract class AbstractDao<T> implements IDao<T> {
         return entity;
     }
 
+    // Implémentation par défaut
+    @Override
+    public T findByEmail(String email) {
+        return null;
+    }
+
     private boolean executeTransaction(HibernateOperation<T> operation) {
         Session session = null;
         Transaction tx = null;

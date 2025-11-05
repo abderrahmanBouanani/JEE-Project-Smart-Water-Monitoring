@@ -14,4 +14,6 @@ public interface IDao <T> {
 
     T findById(Long id);
 
+    // Ajout de la nouvelle méthode
+    T findByEmail(String email);
 }
