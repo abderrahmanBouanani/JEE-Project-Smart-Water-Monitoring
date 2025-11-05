@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import model.Utilisateur;
+import model.TypeUtilisateur;
 import services.UtilisateurService;
 
 import java.io.IOException;
@@ -40,21 +41,27 @@ public class AuthServlet extends HttpServlet {
 
         Utilisateur utilisateur = utilisateurService.findByEmail(email);
 
-        // Dans une vraie application, il faudrait comparer des mots de passe hashés
         if (utilisateur != null && utilisateur.getMotDePasse().equals(password)) {
-            // Créer la session
             HttpSession session = request.getSession();
             session.setAttribute("user", utilisateur);
-            response.sendRedirect(request.getContextPath() + "/index.jsp"); // Rediriger vers l'accueil
+
+            // Redirection en fonction du rôle
+            if (utilisateur.getType() == TypeUtilisateur.ADMINISTRATEUR) {
+                response.sendRedirect(request.getContextPath() + "/index.jsp");
+            } else if (utilisateur.getType() == TypeUtilisateur.CITOYEN) {
+                response.sendRedirect(request.getContextPath() + "/dashboard");
+            } else {
+                // Fallback pour d'autres types d'utilisateurs si nécessaire
+                response.sendRedirect(request.getContextPath() + "/login.jsp");
+            }
         } else {
-            // Échec de l'authentification
             request.setAttribute("error", "Email ou mot de passe incorrect.");
             request.getRequestDispatcher("/login.jsp").forward(request, response);
         }
     }
 
     private void logout(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        HttpSession session = request.getSession(false); // Ne pas créer de session si elle n'existe pas
+        HttpSession session = request.getSession(false);
         if (session != null) {
             session.invalidate();
         }
