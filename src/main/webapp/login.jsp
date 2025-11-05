@@ -11,6 +11,10 @@
         <p style="color:red;">${error}</p>
     </c:if>
 
+    <c:if test="${param.signup == 'success'}">
+        <p style="color:green;">Inscription réussie ! Vous pouvez maintenant vous connecter.</p>
+    </c:if>
+
     <form action="${pageContext.request.contextPath}/auth" method="post">
         <input type="hidden" name="action" value="login">
         <div>
@@ -25,6 +29,8 @@
             <button type="submit">Se connecter</button>
         </div>
     </form>
+
+    <p>Pas encore de compte ? <a href="signup.jsp">Inscrivez-vous</a>.</p>
 
 </body>
 </html>

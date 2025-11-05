@@ -18,8 +18,8 @@ public class AuthenticationFilter implements Filter {
 
         String path = httpRequest.getRequestURI().substring(httpRequest.getContextPath().length());
 
-        // Permettre l'accès aux pages publiques (login, ressources statiques, etc.)
-        if (path.startsWith("/login.jsp") || path.startsWith("/auth") || path.startsWith("/assets/")) {
+        // Permettre l'accès aux pages publiques
+        if (path.startsWith("/login.jsp") || path.startsWith("/signup.jsp") || path.startsWith("/auth") || path.startsWith("/signup") || path.startsWith("/assets/")) {
             chain.doFilter(request, response); // Continue vers la ressource demandée
             return;
         }
@@ -35,7 +35,6 @@ public class AuthenticationFilter implements Filter {
         }
     }
 
-    // Méthodes init() et destroy() peuvent rester vides pour cet exemple
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {}
 
