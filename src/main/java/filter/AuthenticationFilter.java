@@ -17,7 +17,7 @@ public class AuthenticationFilter implements Filter {
         HttpServletResponse httpResponse = (HttpServletResponse) response;
 
         String path = httpRequest.getRequestURI().substring(httpRequest.getContextPath().length());
-
+git
         // Permettre l'accès aux pages publiques
         if (path.startsWith("/login.jsp") || path.startsWith("/signup.jsp") || path.startsWith("/auth") || path.startsWith("/signup") || path.startsWith("/assets/")) {
             chain.doFilter(request, response); // Continue vers la ressource demandée
