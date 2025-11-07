@@ -1,0 +1,26 @@
+# Fichiers temporaires LaTeX à ignorer
+*.aux
+*.log
+*.lof
+*.lot
+*.out
+*.toc
+*.gz
+*.blg
+*.bbl
+*.fls
+*.fdb_latexmk
+
+# Autres fichiers potentiellement générés
+*.synctex.gz
+*.nav
+*.snm
+
+# Ignore tout sauf ce que tu veux garder
+!../Rapport du projet Latex/chapters/
+!figures/
+!references.bib
+!main.pdf
+!main_report.sty
+!glossaries.tex
+!main.tex

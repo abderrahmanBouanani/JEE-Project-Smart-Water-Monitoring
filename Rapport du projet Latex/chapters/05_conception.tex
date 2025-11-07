@@ -1,0 +1,117 @@
+\chapter{Analyse et conception}
+\label{ch:analysis_design}
+
+% =============================
+% INTRODUCTION
+% =============================
+\section{Introduction}
+Cette section présente l’objectif du chapitre, qui consiste à traduire les besoins fonctionnels 
+et non fonctionnels du projet en une solution technique détaillée. Elle explique comment les choix 
+de modélisation, d’architecture et de conception ont été déterminés et justifiés, et comment ils 
+s’inscrivent dans la logique globale du projet. 
+
+% =============================
+% FORMALISME DE MODÉLISATION
+% =============================
+\section{Formalisme de modélisation (UML, etc.)}
+\subsection*{Motivation et choix}
+Décrivez ici pourquoi vous avez choisi d’utiliser un langage de modélisation tel que l’UML.  
+Précisez en quoi ce formalisme aide à :
+\begin{itemize}
+    \item Décrire la structure et le comportement du système.
+    \item Communiquer efficacement entre les membres de l’équipe.
+    \item Garantir la cohérence et la maintenabilité du projet.
+\end{itemize}
+
+\subsection*{Diagrammes retenus}
+Listez et décrivez les différents diagrammes que vous avez retenus pour modéliser le système, par exemple :
+\begin{itemize}
+    \item \textbf{Diagramme de classes :} pour représenter la structure statique (entités, attributs, méthodes, relations).
+    \item \textbf{Diagrammes de séquence :} pour illustrer l’enchaînement des interactions lors de scénarios clés.
+    \item \textbf{Autres diagrammes (activités, composants, déploiement) :} selon les besoins du projet.
+\end{itemize}
+
+% =============================
+% ARCHITECTURE LOGICIELLE
+% =============================
+\section{Architecture logicielle}
+Cette section décrit l’\textbf{architecture globale} du système, en distinguant clairement 
+l’approche adoptée et en expliquant la répartition fonctionnelle et technique du code.
+
+\subsection{Approche architecturale}
+Présentez ici le choix entre une architecture \textbf{monolithique} et une architecture 
+\textbf{microservices} en détaillant :
+\begin{itemize}
+    \item \textbf{Architecture monolithique :} 
+    \begin{itemize}
+        \item \emph{Avantages} : simplicité de développement initial, déploiement unifié.
+        \item \emph{Inconvénients} : difficulté de maintenance et de scalabilité sur le long terme.
+    \end{itemize}
+    \item \textbf{Architecture microservices :} 
+    \begin{itemize}
+        \item \emph{Avantages} : scalabilité fine, isolation des pannes, flexibilité technologique.
+        \item \emph{Inconvénients} : complexité de déploiement et de gestion des communications inter-services.
+    \end{itemize}
+\end{itemize}
+Justifiez le choix fait pour votre projet en fonction des exigences et contraintes identifiées.
+
+\subsection{Schéma de l'architecture et organisation en couches}
+Expliquez la division du système en différentes couches, par exemple :
+\begin{itemize}
+    \item \textbf{Couche de présentation :} gère l’interface utilisateur.
+    \item \textbf{Couche de logique métier :} contient les règles de traitement et la gestion des opérations.
+    \item \textbf{Couche de données :} responsable de la persistance et de l’accès aux informations.
+\end{itemize}
+Vous pouvez également présenter un schéma illustrant les interactions entre ces couches.
+
+\subsection{Discussion}
+Précisez en quoi cette architecture répond aux besoins fonctionnels et non fonctionnels du projet 
+(maintenabilité, scalabilité, performance, sécurité, etc.) et comment elle prépare la voie pour l’implémentation.
+
+% =============================
+% DIAGRAMMES DE CONCEPTION
+% =============================
+\section{Diagrammes de conception}
+Cette section détaille les différents diagrammes qui ont servi à formaliser la conception du système.
+
+\subsection{Diagramme de classes}
+\begin{itemize}
+    \item \textbf{Présentation des entités :} listez les classes principales, leurs attributs et leurs méthodes.
+    \item \textbf{Relations et cardinalités :} décrivez les associations, agrégations, compositions et héritages, en précisant les cardinalités.
+\end{itemize}
+
+\subsection{Diagrammes de séquence}
+\begin{itemize}
+    \item \textbf{Scénarios clés :} illustrez l’enchaînement des interactions pour des processus importants (exemple : authentification, traitement d'une requête, etc.).
+    \item \textbf{Flux d’interaction :} montrez comment les messages circulent entre les objets ou composants pour répondre à une action utilisateur.
+\end{itemize}
+
+\subsection{Autres diagrammes utiles}
+Selon les spécificités du projet, vous pouvez également inclure :
+\begin{itemize}
+    \item \textbf{Diagramme de composants :} pour visualiser la répartition modulaire du système et les dépendances entre les modules.
+    \item \textbf{Diagramme d’activités :} pour représenter le flux de travail global ou des processus métier complexes.
+    \item \textbf{Diagramme de déploiement :} pour illustrer la répartition des composants sur l’infrastructure matérielle (serveurs, conteneurs, cloud, etc.).
+\end{itemize}
+
+% =============================
+% CONCLUSION
+% =============================
+\section{Conclusion}
+Pour conclure ce chapitre, il convient de récapituler les éléments essentiels présentés :
+\begin{itemize}
+    \item \textbf{Synthèse des choix d’architecture et de modélisation :}  
+    rappeler brièvement le modèle choisi (architecture et formalisme de modélisation) et les diagrammes 
+    qui en résultent.
+    
+    \item \textbf{Justification des décisions :}  
+    expliquer en quoi ces choix répondent aux besoins identifiés et aux contraintes du projet 
+    (modularité, évolutivité, sécurité, performance, etc.).
+    
+    \item \textbf{Transition vers la phase de réalisation :}  
+    indiquer que les modèles présentés serviront de base pour l’implémentation effective du système, 
+    qui sera détaillée dans le chapitre suivant.
+\end{itemize}
+
+\noindent
+Ce chapitre d'analyse et de conception constitue ainsi le socle technique sur lequel reposera la réalisation du projet.

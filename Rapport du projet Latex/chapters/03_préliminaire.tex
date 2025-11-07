@@ -1,0 +1,97 @@
+\chapter{Étude préliminaire et fonctionnelle}
+
+\section{Introduction}
+Ce chapitre a pour objectif de \textbf{cadrer les besoins} auxquels le projet doit répondre, 
+qu’ils soient liés aux fonctionnalités principales, aux contraintes techniques ou encore 
+à l’expérience utilisateur. Il permet également de clarifier \textbf{l’identité} des différents 
+acteurs, ainsi que leur rôle dans le système. Enfin, il détaille la logique de fonctionnement 
+au travers de cas d’utilisation et de processus métier éventuels.
+
+\section{Étude des besoins}
+Dans cette section, on distingue généralement deux grandes catégories de besoins : 
+\textbf{fonctionnels} (qui décrivent ce que le système doit faire) et 
+\textbf{non fonctionnels} (liés aux performances, à la fiabilité, à la sécurité, etc.).
+
+\subsection{Besoins fonctionnels}
+\begin{itemize}
+    \item \textbf{Lister les fonctionnalités principales :}  
+    Il s’agit de décrire toutes les actions ou services que l’application devra proposer 
+    (ex. création de comptes, calcul d’un paramètre spécifique, édition de rapports, etc.).
+    \item \textbf{Illustrer par des scénarios d’utilisation concrets :}  
+    Décrire, par exemple, les étapes qu’un utilisateur va suivre pour atteindre un objectif 
+    (inscription, consultation, validation, etc.). Cela aide à mieux cerner la séquence 
+    d’actions nécessaires et l’interface ou les interfaces prévues.
+\end{itemize}
+
+\subsection{Besoins non fonctionnels}
+\begin{itemize}
+    \item \textbf{Contraintes de performance, de sécurité et de fiabilité :}  
+    Par exemple, temps de réponse maximal acceptable, taux de disponibilité, 
+    modes d’authentification ou de chiffrement des données, etc.
+    \item \textbf{Implications sur le choix de l’architecture ou de la technologie :}  
+    Mentionner les répercussions sur les choix de framework (Spring Boot, Django, etc.), 
+    de base de données (SQL ou NoSQL), ou encore sur le design (microservices, monolithique).
+\end{itemize}
+
+\section{Identification des acteurs}
+L’identification des acteurs consiste à \textbf{définir les différents profils} qui interagiront 
+avec le système, ainsi que leurs droits et responsabilités.
+
+\begin{itemize}
+    \item \textbf{Description des profils :}  
+    Par exemple, un administrateur, un utilisateur classique, un superviseur, un étudiant, 
+    un enseignant, etc.
+    \item \textbf{Fonctionnalités associées :}  
+    Chaque acteur se voit attribuer des permissions spécifiques (créer un compte, valider 
+    une saisie, accéder à certaines données sensibles, etc.). Lister en détail ces habilitations 
+    permet d’anticiper la gestion des rôles et des autorisations.
+\end{itemize}
+
+\section{Cas d’utilisation et diagrammes}
+Les \textbf{use cases} (cas d’utilisation) sont très utiles pour formaliser comment chaque acteur 
+utilise le système. Ils peuvent être représentés sous forme de diagramme UML, accompagné 
+d’une description textuelle plus précise.
+
+\begin{itemize}
+    \item \textbf{Présentation des use cases :}  
+    Un diagramme UML permet de visualiser rapidement quelles actions sont possibles pour 
+    chaque acteur. Chaque use case peut ensuite être décrit textuellement (préconditions, 
+    flux principal, flux alternatif, postconditions).
+    \item \textbf{Couverture des besoins fonctionnels :}  
+    Vérifier que l’ensemble des fonctionnalités clés identifiées dans la section précédente 
+    se retrouve bien dans les cas d’utilisation. Cela contribue à la cohérence du projet.
+\end{itemize}
+
+\section{Processus métier (si nécessaire)}
+Dans certains projets, il peut être pertinent de détailler le \textbf{workflow global} (suite 
+d’étapes) sous forme de \textbf{diagramme BPMN} ou de \textbf{diagramme d’activités UML}. 
+
+\begin{itemize}
+    \item \textbf{Décrire le flux d’informations :}  
+    Illustrer l’enchaînement des opérations (par exemple, traitement d’une demande, validation 
+    par un chef d’équipe, notification à un utilisateur, etc.).
+    \item \textbf{Validations et étapes-clés :}  
+    S’il y a lieu de valider un document, de signer un contrat, de changer l’état d’une commande, 
+    etc., il faut expliciter ces jalons importants (qui valide ? comment ?).
+\end{itemize}
+La figure \ref{fig:bpmn} présente un exemple d'un diagramme BPMN.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\linewidth]{figures/bpmn_example.png}
+    \caption{BPMN Diagramme Processus Métier - Exemple Prêt de Livres. }
+    \label{fig:bpmn}
+\end{figure}
+\section{Conclusion}
+Pour conclure, il est important de dresser un bilan synthétique de l’étude fonctionnelle et 
+préliminaire, afin de clarifier les points suivants :
+
+\begin{itemize}
+    \item \textbf{Résumé de la vision fonctionnelle :}  
+    Rappeler brièvement les grandes fonctionnalités prévues, les rôles et responsabilités 
+    des acteurs, et les contraintes majeures (performance, sécurité, etc.).
+    
+    \item \textbf{Transition vers l’état de l’art ou travaux préexistants :}  
+    Le chapitre suivant, souvent consacré à la \textit{revue de littérature} ou à l’étude 
+    de l’existant, permettra de confronter ces besoins avec les solutions ou approches déjà 
+    disponibles, et d’affiner la pertinence du choix technique qui sera opéré.
+\end{itemize}
