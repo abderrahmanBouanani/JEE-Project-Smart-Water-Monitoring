@@ -2,7 +2,6 @@ package services;
 
 import dao.StatistiqueDao;
 import model.Statistique;
-
 import java.util.List;
 
 public class StatistiqueService implements IService<Statistique> {
@@ -32,5 +31,32 @@ public class StatistiqueService implements IService<Statistique> {
     @Override
     public Statistique findById(Long id) {
         return statistiqueDao.findById(id);
+    }
+
+    // ✅ NOUVELLES MÉTHODES
+    public List<Statistique> findByUserId(Long userId) {
+        return statistiqueDao.findByUserId(userId);
+    }
+
+    public List<Statistique> findByTypeAndUserId(String type, Long userId) {
+        return statistiqueDao.findByTypeAndUserId(type, userId);
+    }
+
+    // Méthode utilitaire pour les statistiques de consommation moyenne
+    public Double getConsommationMoyenneByUserId(Long userId) {
+        List<Statistique> stats = findByTypeAndUserId("CONSOMMATION_MOYENNE", userId);
+        if (!stats.isEmpty()) {
+            return stats.get(0).getValeur();
+        }
+        return null;
+    }
+
+    // Méthode utilitaire pour les statistiques de consommation totale
+    public Double getConsommationTotaleByUserId(Long userId) {
+        List<Statistique> stats = findByTypeAndUserId("CONSOMMATION_TOTALE", userId);
+        if (!stats.isEmpty()) {
+            return stats.get(0).getValeur();
+        }
+        return null;
     }
 }

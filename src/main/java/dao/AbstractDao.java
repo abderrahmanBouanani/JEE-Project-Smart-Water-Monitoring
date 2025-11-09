@@ -88,6 +88,30 @@ public abstract class AbstractDao<T> implements IDao<T> {
         return status;
     }
 
+    public List<T> findByUserId(Long userId) {
+        Session session = null;
+        Transaction tx = null;
+        List<T> list = null;
+        try {
+            session = HibernateUtil.getSessionFactory().openSession();
+            tx = session.beginTransaction();
+
+            // Requête générique pour les entités qui ont une relation "utilisateur"
+            String query = "FROM " + entityClass.getSimpleName() + " WHERE utilisateur.idUtilisateur = :userId";
+            list = session.createQuery(query, entityClass)
+                    .setParameter("userId", userId)
+                    .list();
+
+            tx.commit();
+        } catch (HibernateException e) {
+            if (tx != null) tx.rollback();
+            e.printStackTrace();
+        } finally {
+            if (session != null) session.close();
+        }
+        return list;
+    }
+
     @FunctionalInterface
     private interface HibernateOperation<T> {
         void execute(Session session);

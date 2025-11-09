@@ -33,4 +33,9 @@ public class DonneeCapteurService implements IService<DonneeCapteur> {
     public DonneeCapteur findById(Long id) {
         return donneeCapteurDao.findById(id);
     }
+
+    // Dans DonneeCapteurService.java - ajoute cette méthode
+    public List<DonneeCapteur> findRecentByUserId(Long userId) {
+        return donneeCapteurDao.findRecentByUserId(userId);
+    }
 }

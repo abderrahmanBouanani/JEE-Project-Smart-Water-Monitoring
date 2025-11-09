@@ -1,4 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -8,185 +9,202 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        .card {
-            margin-bottom: 20px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-        .filter-section {
-            background-color: #f8f9fa;
-            padding: 15px;
-            border-radius: 5px;
+        .stat-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             margin-bottom: 20px;
         }
-        .export-buttons {
-            margin-top: 20px;
-        }
-        .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 2rem 0;
-            margin-bottom: 2rem;
+        .debug-info {
+            font-size: 0.8rem;
         }
     </style>
 </head>
 <body>
-    <!-- Header -->
-    <div class="header">
-        <div class="container">
-            <div class="d-flex justify-content-between align-items-center">
-                <h1 class="h3 mb-0">📊 Statistiques de Consommation</h1>
-                <a href="${pageContext.request.contextPath}/dashboard" class="btn btn-light">← Retour au tableau de bord</a>
-            </div>
-        </div>
-    </div>
 
-    <div class="container">
-        <!-- Section Filtres -->
-        <div class="filter-section">
-            <h5 class="mb-3">🔍 Filtres</h5>
-            <form id="filterForm" class="row g-3">
-                <div class="col-md-3">
-                    <label for="periode" class="form-label">Période</label>
-                    <select class="form-select" id="periode" name="periode">
-                        <option value="jour">Quotidienne</option>
-                        <option value="semaine">Hebdomadaire</option>
-                        <option value="mois" selected>Mensuelle</option>
-                        <option value="annee">Annuelle</option>
-                    </select>
+            <!-- Main Content -->
+            <main class=" px-md-4">
+                <!-- Header -->
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2">
+                        <i class="fas fa-chart-bar me-2"></i>Statistiques de Consommation
+                    </h1>
+                    <a href="${pageContext.request.contextPath}/dashboard" class="btn btn-outline-primary">
+                        <i class="fas fa-arrow-left me-1"></i>Retour au dashboard
+                    </a>
                 </div>
-                <div class="col-md-3">
-                    <label for="objet" class="form-label">Type de consommation</label>
-                    <select class="form-select" id="objet" name="objet">
-                        <option value="tous">Tous</option>
-                        <option value="eau">Eau</option>
-                        <option value="electricite">Électricité</option>
-                        <option value="gaz">Gaz</option>
-                        <option value="dechets">Déchets</option>
-                    </select>
-                </div>
-                <div class="col-md-3">
-                    <label for="dateDebut" class="form-label">Date de début</label>
-                    <input type="date" class="form-control" id="dateDebut" name="dateDebut">
-                </div>
-                <div class="col-md-3">
-                    <label for="dateFin" class="form-label">Date de fin</label>
-                    <input type="date" class="form-control" id="dateFin" name="dateFin">
-                </div>
-                <div class="col-12">
-                    <button type="submit" class="btn btn-primary">Appliquer les filtres</button>
-                    <button type="reset" class="btn btn-outline-secondary">Réinitialiser</button>
-                </div>
-            </form>
-        </div>
 
-        <!-- Section Graphiques -->
-        <div class="row">
-            <!-- Graphique Consommation Quotidienne -->
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-header bg-primary text-white">
-                        <h5 class="card-title mb-0">📈 Consommation Quotidienne</h5>
+                <!-- Debug Info -->
+                <div class="alert alert-info debug-info">
+                    <strong>Debug:</strong>
+                    User ID: ${userId} |
+                    Statistiques: ${statistiques.size()} |
+                    Moyenne: ${consommationMoyenne}L |
+                    Totale: ${consommationTotale}L
+                </div>
+
+                <c:if test="${not empty error}">
+                    <div class="alert alert-danger">
+                        <strong>Erreur:</strong> ${error}
                     </div>
-                    <div class="card-body">
-                        <canvas id="dailyChart" height="250"></canvas>
+                </c:if>
+
+                <!-- Statistiques Résumées -->
+                <div class="row mb-4">
+                    <div class="col-md-4">
+                        <div class="stat-card text-center">
+                            <div class="text-primary mb-2">
+                                <i class="fas fa-tint fa-2x"></i>
+                            </div>
+                            <h3 class="text-primary">
+                                <c:choose>
+                                    <c:when test="${not empty consommationMoyenne}">
+                                        ${consommationMoyenne}L
+                                    </c:when>
+                                    <c:otherwise>
+                                        -
+                                    </c:otherwise>
+                                </c:choose>
+                            </h3>
+                            <p class="text-muted mb-0">Consommation Moyenne</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="stat-card text-center">
+                            <div class="text-success mb-2">
+                                <i class="fas fa-chart-line fa-2x"></i>
+                            </div>
+                            <h3 class="text-success">
+                                <c:choose>
+                                    <c:when test="${not empty consommationTotale}">
+                                        ${consommationTotale}L
+                                    </c:when>
+                                    <c:otherwise>
+                                        -
+                                    </c:otherwise>
+                                </c:choose>
+                            </h3>
+                            <p class="text-muted mb-0">Consommation Totale</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="stat-card text-center">
+                            <div class="text-info mb-2">
+                                <i class="fas fa-database fa-2x"></i>
+                            </div>
+                            <h3 class="text-info">${statistiques.size()}</h3>
+                            <p class="text-muted mb-0">Analyses Stockées</p>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Graphique Consommation Mensuelle -->
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-header bg-success text-white">
-                        <h5 class="card-title mb-0">📊 Consommation Mensuelle</h5>
+                <!-- Graphiques -->
+                <div class="row">
+                    <!-- Graphique Consommation Quotidienne -->
+                    <div class="col-md-6">
+                        <div class="stat-card">
+                            <h5 class="card-title">
+                                <i class="fas fa-chart-line me-2 text-primary"></i>Consommation Quotidienne
+                            </h5>
+                            <canvas id="dailyChart" height="250"></canvas>
+                        </div>
                     </div>
-                    <div class="card-body">
-                        <canvas id="monthlyChart" height="250"></canvas>
+
+                    <!-- Graphique Consommation Mensuelle -->
+                    <div class="col-md-6">
+                        <div class="stat-card">
+                            <h5 class="card-title">
+                                <i class="fas fa-chart-bar me-2 text-success"></i>Consommation Mensuelle
+                            </h5>
+                            <canvas id="monthlyChart" height="250"></canvas>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Graphique Consommation Moyenne -->
-            <div class="col-md-12">
-                <div class="card">
-                    <div class="card-header bg-info text-white">
-                        <h5 class="card-title mb-0">⚡ Consommation Moyenne</h5>
-                    </div>
-                    <div class="card-body">
-                        <canvas id="averageChart" height="150"></canvas>
+                <!-- Liste des Statistiques Détaillées -->
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="stat-card">
+                            <h5 class="card-title">
+                                <i class="fas fa-table me-2 text-info"></i>Statistiques Détaillées
+                            </h5>
+
+                            <c:choose>
+                                <c:when test="${not empty statistiques && statistiques.size() > 0}">
+                                    <div class="table-responsive">
+                                        <table class="table table-striped">
+                                            <thead>
+                                                <tr>
+                                                    <th>Type</th>
+                                                    <th>Valeur</th>
+                                                    <th>Période</th>
+                                                    <th>Date de Génération</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <c:forEach var="stat" items="${statistiques}">
+                                                    <tr>
+                                                        <td>${stat.type}</td>
+                                                        <td>
+                                                            <strong>${stat.valeur}</strong>
+                                                            <c:if test="${stat.type.contains('CONSOMMATION')}">L</c:if>
+                                                            <c:if test="${stat.type.contains('COUT')}">€</c:if>
+                                                        </td>
+                                                        <td>${stat.periode}</td>
+                                                        <td>${stat.dateGeneration}</td>
+                                                    </tr>
+                                                </c:forEach>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </c:when>
+                                <c:otherwise>
+                                    <div class="text-center text-muted py-4">
+                                        <i class="fas fa-chart-bar fa-3x mb-3"></i>
+                                        <h5>Aucune statistique disponible</h5>
+                                        <p>Les statistiques seront générées automatiquement avec l'utilisation du système.</p>
+                                    </div>
+                                </c:otherwise>
+                            </c:choose>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div>
-
-        <!-- Section Export -->
-        <div class="export-buttons text-center">
-            <h5 class="mb-3">💾 Exporter les données</h5>
-            <button type="button" class="btn btn-success me-2" onclick="exportData('csv')">
-                📄 Exporter en CSV
-            </button>
-            <button type="button" class="btn btn-danger" onclick="exportData('pdf')">
-                📑 Exporter en PDF
-            </button>
-        </div>
-    </div>
+            </main>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-
     <script>
-        // Initialisation des dates
+        // Initialisation des graphiques avec les données du serveur
         document.addEventListener('DOMContentLoaded', function() {
-            const today = new Date();
-            const oneMonthAgo = new Date();
-            oneMonthAgo.setDate(today.getDate() - 30);
-
-            document.getElementById('dateFin').value = today.toISOString().split('T')[0];
-            document.getElementById('dateDebut').value = oneMonthAgo.toISOString().split('T')[0];
-
-            initializeCharts();
-        });
-
-        function initializeCharts() {
-            // Données simulées pour la consommation d'électricité
+            // Données du serveur (passées depuis le Servlet)
             const dailyData = {
                 labels: ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'],
                 datasets: [{
-                    label: 'Consommation (kWh)',
-                    data: [12.5, 19.2, 8.7, 15.3, 12.8, 18.6, 14.1],
+                    label: 'Consommation (L)',
+                    data: [
+                        <c:forEach var="valeur" items="${donneesQuotidiennes}" varStatus="status">
+                        ${valeur}<c:if test="${!status.last}">, </c:if>
+                        </c:forEach>
+                    ],
                     backgroundColor: 'rgba(54, 162, 235, 0.2)',
                     borderColor: 'rgba(54, 162, 235, 1)',
                     borderWidth: 2,
-                    tension: 0.4,
-                    fill: true
+                    tension: 0.4
                 }]
             };
 
             const monthlyData = {
                 labels: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun'],
                 datasets: [{
-                    label: 'Consommation (kWh)',
-                    data: [450, 420, 380, 350, 320, 300],
+                    label: 'Consommation (L)',
+                    data: [
+                        <c:forEach var="valeur" items="${donneesMensuelles}" varStatus="status">
+                        ${valeur}<c:if test="${!status.last}">, </c:if>
+                        </c:forEach>
+                    ],
                     backgroundColor: 'rgba(75, 192, 192, 0.2)',
                     borderColor: 'rgba(75, 192, 192, 1)',
                     borderWidth: 2
-                }]
-            };
-
-            const averageData = {
-                labels: ['Moyenne Journalière', 'Moyenne Mensuelle', 'Moyenne Annuelle'],
-                datasets: [{
-                    label: 'Consommation Moyenne (kWh)',
-                    data: [15.2, 350, 4200],
-                    backgroundColor: [
-                        'rgba(255, 99, 132, 0.8)',
-                        'rgba(54, 162, 235, 0.8)',
-                        'rgba(255, 205, 86, 0.8)'
-                    ],
-                    borderColor: [
-                        'rgba(255, 99, 132, 1)',
-                        'rgba(54, 162, 235, 1)',
-                        'rgba(255, 205, 86, 1)'
-                    ],
-                    borderWidth: 1
                 }]
             };
 
@@ -198,31 +216,7 @@
                 options: {
                     responsive: true,
                     plugins: {
-                        legend: {
-                            position: 'top',
-                            labels: { font: { size: 12 } }
-                        },
-                        tooltip: {
-                            mode: 'index',
-                            intersect: false
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: 'kWh',
-                                font: { weight: 'bold' }
-                            }
-                        },
-                        x: {
-                            title: {
-                                display: true,
-                                text: 'Jours de la semaine',
-                                font: { weight: 'bold' }
-                            }
-                        }
+                        legend: { display: false }
                     }
                 }
             });
@@ -235,110 +229,10 @@
                 options: {
                     responsive: true,
                     plugins: {
-                        legend: {
-                            position: 'top',
-                            labels: { font: { size: 12 } }
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: 'kWh',
-                                font: { weight: 'bold' }
-                            }
-                        },
-                        x: {
-                            title: {
-                                display: true,
-                                text: 'Mois',
-                                font: { weight: 'bold' }
-                            }
-                        }
+                        legend: { display: false }
                     }
                 }
             });
-
-            // Graphique moyenne
-            const averageCtx = document.getElementById('averageChart').getContext('2d');
-            new Chart(averageCtx, {
-                type: 'bar',
-                data: averageData,
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    return `Consommation: ${context.parsed.y} kWh`;
-                                }
-                            }
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: 'kWh',
-                                font: { weight: 'bold' }
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        // Gestion des filtres
-        document.getElementById('filterForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const filters = {
-                periode: document.getElementById('periode').value,
-                objet: document.getElementById('objet').value,
-                dateDebut: document.getElementById('dateDebut').value,
-                dateFin: document.getElementById('dateFin').value
-            };
-
-            console.log('Filtres appliqués:', filters);
-
-            // Simulation du rechargement des données
-            alert('Filtres appliqués avec succès!\n\n' +
-                  'Période: ' + filters.periode + '\n' +
-                  'Type: ' + filters.objet + '\n' +
-                  'Du: ' + filters.dateDebut + '\n' +
-                  'Au: ' + filters.dateFin);
-
-            // Ici vous ajouterez un appel AJAX pour recharger les données
-            // fetch('/api/statistiques/filtres', { ... })
-        });
-
-        // Fonction d'export
-        function exportData(format) {
-            const filters = {
-                periode: document.getElementById('periode').value,
-                objet: document.getElementById('objet').value,
-                dateDebut: document.getElementById('dateDebut').value,
-                dateFin: document.getElementById('dateFin').value
-            };
-
-            if (format === 'csv') {
-                alert('📄 Export CSV initié avec les filtres actuels\n\nCette fonctionnalité sera connectée au backend.');
-                // window.location.href = '/api/export/csv?periode=' + filters.periode + '&objet=' + filters.objet;
-            } else if (format === 'pdf') {
-                alert('📑 Export PDF initié avec les filtres actuels\n\nCette fonctionnalité sera connectée au backend.');
-                // window.location.href = '/api/export/pdf?periode=' + filters.periode + '&objet=' + filters.objet;
-            }
-        }
-
-        // Réinitialiser les graphiques quand les filtres changent
-        document.getElementById('periode').addEventListener('change', function() {
-            console.log('Période changée:', this.value);
-        });
-
-        document.getElementById('objet').addEventListener('change', function() {
-            console.log('Type de consommation changé:', this.value);
         });
     </script>
 </body>

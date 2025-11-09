@@ -2,7 +2,6 @@ package services;
 
 import dao.AlerteDao;
 import model.Alerte;
-
 import java.util.List;
 
 public class AlerteService implements IService<Alerte> {
@@ -32,5 +31,18 @@ public class AlerteService implements IService<Alerte> {
     @Override
     public Alerte findById(Long id) {
         return alerteDao.findById(id);
+    }
+
+    // NOUVELLES MÉTHODES
+    public List<Alerte> findByUserId(Long userId) {
+        return alerteDao.findByUserId(userId);
+    }
+
+    public List<Alerte> findUnreadByUserId(Long userId) {
+        return alerteDao.findUnreadByUserId(userId);
+    }
+
+    public int countUnreadByUserId(Long userId) {
+        return alerteDao.findUnreadByUserId(userId).size();
     }
 }
