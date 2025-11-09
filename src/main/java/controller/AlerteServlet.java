@@ -106,15 +106,20 @@ public class AlerteServlet extends HttpServlet {
 
     private void showNewForm(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         request.setAttribute("typesAlerte", TypeAlerte.values());
+        request.setAttribute("utilisateurs", utilisateurService.findAll());
         RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/views/alerte/form.jsp");
         dispatcher.forward(request, response);
     }
 
     private void showEditForm(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         Long id = Long.parseLong(request.getParameter("id"));
+        System.out.println("📝 Modification alerte ID: " + id);
+
         Alerte alerteExistante = alerteService.findById(id);
         request.setAttribute("alerte", alerteExistante);
         request.setAttribute("typesAlerte", TypeAlerte.values());
+        request.setAttribute("utilisateurs", utilisateurService.findAll());
+
         RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/views/alerte/form.jsp");
         dispatcher.forward(request, response);
     }
