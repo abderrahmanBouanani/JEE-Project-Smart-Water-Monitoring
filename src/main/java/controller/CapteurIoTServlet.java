@@ -80,12 +80,16 @@ public class CapteurIoTServlet extends HttpServlet {
         try {
             // Récupérer tous les capteurs
             List<CapteurIoT> capteurs = capteurIoTService.findAll();
+            if (capteurs == null) {
+                capteurs = new java.util.ArrayList<>();
+            }
             System.out.println("✅ Capteurs récupérés: " + capteurs.size());
 
             // Calculer les statistiques
             long totalCapteurs = capteurs.size();
             long capteursActifs = capteurs.stream().filter(CapteurIoT::isEtat).count();
-            long totalDonnees = donneeCapteurService.findAll().size();
+            List donneesCapteursAll = donneeCapteurService.findAll();
+            long totalDonnees = (donneesCapteursAll != null) ? donneesCapteursAll.size() : 0;
 
             request.setAttribute("capteurs", capteurs);
             request.setAttribute("totalCapteurs", totalCapteurs);
@@ -97,21 +101,37 @@ public class CapteurIoTServlet extends HttpServlet {
 
         } catch (Exception e) {
             System.out.println("❌ Erreur listCapteurs: " + e.getMessage());
-            throw e;
+            e.printStackTrace();
+            request.setAttribute("error", "Erreur lors du chargement des capteurs");
+            request.setAttribute("capteurs", new java.util.ArrayList<>());
+            request.setAttribute("totalCapteurs", 0);
+            request.setAttribute("capteursActifs", 0);
+            request.setAttribute("totalDonnees", 0);
+            RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/views/capteur/list.jsp");
+            dispatcher.forward(request, response);
         }
     }
 
     private void showNewForm(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         try {
             request.setAttribute("typesCapteur", TypeCapteur.values());
-            request.setAttribute("utilisateurs", utilisateurService.findAll());
-            System.out.println("✅ Formulaire création - Types: " + TypeCapteur.values().length + ", Users: " + utilisateurService.findAll().size());
+            List<Utilisateur> utilisateurs = utilisateurService.findAll();
+            if (utilisateurs == null) {
+                utilisateurs = new java.util.ArrayList<>();
+            }
+            request.setAttribute("utilisateurs", utilisateurs);
+            System.out.println("✅ Formulaire création - Types: " + TypeCapteur.values().length + ", Users: " + utilisateurs.size());
 
             RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/views/capteur/form.jsp");
             dispatcher.forward(request, response);
         } catch (Exception e) {
             System.out.println("❌ Erreur showNewForm: " + e.getMessage());
-            throw e;
+            e.printStackTrace();
+            request.setAttribute("error", "Erreur lors du chargement du formulaire");
+            request.setAttribute("typesCapteur", TypeCapteur.values());
+            request.setAttribute("utilisateurs", new java.util.ArrayList<>());
+            RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/views/capteur/form.jsp");
+            dispatcher.forward(request, response);
         }
     }
 

@@ -25,7 +25,7 @@
                     <div class="alert alert-info">
                         <h4>📭 Aucune alerte</h4>
                         <p>Vous n'avez aucune alerte pour le moment.</p>
-                        <a href="${pageContext.request.contextPath}/" class="btn btn-primary">
+                        <a href="${pageContext.request.contextPath}/dashboard" class="btn btn-primary">
                             Retour à l'accueil
                         </a>
                     </div>

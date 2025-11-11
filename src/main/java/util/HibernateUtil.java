@@ -10,10 +10,22 @@ public class HibernateUtil {
     private static SessionFactory buildSessionFactory() {
         try {
             // Create the SessionFactory from hibernate.cfg.xml
-            return new Configuration().configure().buildSessionFactory();
-        } catch (java.lang.Throwable ex) {
-            // Make sure you log the exception, as it might be swallowed
-            System.err.println("Initial SessionFactory creation failed." + ex);
+            System.out.println("🔄 Initializing Hibernate SessionFactory...");
+            SessionFactory sf = new Configuration().configure().buildSessionFactory();
+            System.out.println("✅ Hibernate SessionFactory initialized successfully");
+            return sf;
+        } catch (Throwable ex) {
+            // Log the exception with full stack trace
+            System.err.println("❌ Initial SessionFactory creation failed!");
+            System.err.println("Error: " + ex.getMessage());
+            ex.printStackTrace();
+
+            // Print root cause if available
+            if (ex.getCause() != null) {
+                System.err.println("Root cause: " + ex.getCause().getMessage());
+                ex.getCause().printStackTrace();
+            }
+
             throw new ExceptionInInitializerError(ex);
         }
     }

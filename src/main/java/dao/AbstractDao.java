@@ -38,8 +38,13 @@ public abstract class AbstractDao<T> implements IDao<T> {
             tx = session.beginTransaction();
             list = session.createQuery("from " + entityClass.getSimpleName()).list();
             tx.commit();
-        } catch (HibernateException e) {
+        } catch (Exception e) {
             if (tx != null) tx.rollback();
+            // Log the exception for debugging
+            System.err.println("Error fetching all " + entityClass.getSimpleName() + ": " + e.getMessage());
+            e.printStackTrace();
+            // Return an empty list instead of null to prevent NPE
+            list = new java.util.ArrayList<>();
         } finally {
             if (session != null) session.close();
         }

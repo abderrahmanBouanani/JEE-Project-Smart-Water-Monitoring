@@ -6,6 +6,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import model.Utilisateur;
 import model.TypeUtilisateur;
 import services.UtilisateurService;
@@ -21,6 +22,20 @@ public class UtilisateurServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        // 🛡️ Vérifier que l'utilisateur est un ADMINISTRATEUR
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("user") == null) {
+            response.sendRedirect(request.getContextPath() + "/login.jsp");
+            return;
+        }
+
+        Utilisateur user = (Utilisateur) session.getAttribute("user");
+        if (user.getType() != TypeUtilisateur.ADMINISTRATEUR) {
+            System.err.println("❌ ACCÈS REFUSÉ: Utilisateur " + user.getNom() + " tente d'accéder à la gestion des utilisateurs");
+            response.sendRedirect(request.getContextPath() + "/dashboard");
+            return;
+        }
+
         String action = request.getParameter("action");
         if (action == null) {
             action = "list";
@@ -95,10 +110,22 @@ public class UtilisateurServlet extends HttpServlet {
     }
 
     private void listUtilisateurs(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        List<Utilisateur> utilisateurs = utilisateurService.findAll();
-        request.setAttribute("utilisateurs", utilisateurs);
-        RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/views/utilisateur/list.jsp");
-        dispatcher.forward(request, response);
+        try {
+            List<Utilisateur> utilisateurs = utilisateurService.findAll();
+            if (utilisateurs == null) {
+                utilisateurs = new java.util.ArrayList<>();
+            }
+            request.setAttribute("utilisateurs", utilisateurs);
+            RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/views/utilisateur/list.jsp");
+            dispatcher.forward(request, response);
+        } catch (Exception e) {
+            System.err.println("Error listing utilisateurs: " + e.getMessage());
+            e.printStackTrace();
+            request.setAttribute("error", "Erreur lors du chargement des utilisateurs");
+            request.setAttribute("utilisateurs", new java.util.ArrayList<>());
+            RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/views/utilisateur/list.jsp");
+            dispatcher.forward(request, response);
+        }
     }
 
     private void showNewForm(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

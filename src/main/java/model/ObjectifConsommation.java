@@ -1,6 +1,6 @@
 package model;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.time.LocalDate;
 
 @Entity
@@ -15,8 +15,10 @@ public class ObjectifConsommation {
     @Column(length = 50)
     private String periode;
 
+    @Temporal(TemporalType.DATE)
     private LocalDate dateDebut;
 
+    @Temporal(TemporalType.DATE)
     private LocalDate dateFin;
 
     private boolean estAtteint;
