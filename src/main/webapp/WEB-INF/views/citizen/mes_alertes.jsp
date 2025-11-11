@@ -125,48 +125,83 @@
         </div>
     </div>
 
-    <!-- Dans la section JavaScript, remplace les données simulées par : -->
-    <script>
-        // Utiliser les données réelles du serveur
-        const serverAlertes = [
-            <c:forEach var="alerte" items="${alertes}" varStatus="status">
-            {
-                idAlerte: ${alerte.idAlerte},
-                type: "${alerte.type}",
-                message: "${alerte.message}",
-                niveauUrgence: "${alerte.niveauUrgence}",
-                dateCreation: "${alerte.dateCreation}",
-                estLue: ${alerte.estLue}
-            }<c:if test="${!status.last}">,</c:if>
-            </c:forEach>
-        ];
+        <!-- Script JavaScript pour les actions -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+        <script>
+            // Fonction pour marquer une alerte comme lue
+            function markAsRead(alerteId) {
+                if (confirm('Marquer cette alerte comme lue ?')) {
+                    // Créer un formulaire pour envoyer la requête POST
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = '${pageContext.request.contextPath}/mes-alertes';
 
-        // Mettre à jour l'affichage avec les vraies données
-        function updateAlertesDisplay() {
-            const totalAlertesCount = serverAlertes.length;
-            const nonLuesCount = serverAlertes.filter(a => !a.estLue).length;
-            const critiquesCount = serverAlertes.filter(a => a.niveauUrgence === 'CRITIQUE').length;
-            const resoluesCount = serverAlertes.filter(a => a.estLue).length;
+                    // Ajouter les paramètres
+                    const actionInput = document.createElement('input');
+                    actionInput.type = 'hidden';
+                    actionInput.name = 'action';
+                    actionInput.value = 'marquer-lue';
+                    form.appendChild(actionInput);
 
-            // Mettre à jour les compteurs
-            document.getElementById('totalAlertesCount').textContent = totalAlertesCount;
-            document.getElementById('nonLuesCount').textContent = nonLuesCount;
-            document.getElementById('critiquesCount').textContent = critiquesCount;
-            document.getElementById('resoluesCount').textContent = resoluesCount;
+                    const alerteIdInput = document.createElement('input');
+                    alerteIdInput.type = 'hidden';
+                    alerteIdInput.name = 'alerteId';
+                    alerteIdInput.value = alerteId;
+                    form.appendChild(alerteIdInput);
 
-            // Afficher les données réelles
-            displayAlertes(serverAlertes);
-        }
+                    // Ajouter le formulaire à la page et le soumettre
+                    document.body.appendChild(form);
+                    form.submit();
+                }
+            }
 
-        // Au chargement de la page
-        document.addEventListener('DOMContentLoaded', function() {
-            updateAlertesDisplay();
+            // Fonction pour archiver une alerte
+            function archiveAlerte(alerteId) {
+                if (confirm('Archiver cette alerte ?')) {
+                    // Créer un formulaire pour envoyer la requête POST
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = '${pageContext.request.contextPath}/mes-alertes';
 
-            // Écouter les changements de filtres
-            document.getElementById('filterType').addEventListener('change', applyFilters);
-            document.getElementById('filterUrgence').addEventListener('change', applyFilters);
-            document.getElementById('filterStatut').addEventListener('change', applyFilters);
-        });
-    </script>
+                    // Ajouter les paramètres
+                    const actionInput = document.createElement('input');
+                    actionInput.type = 'hidden';
+                    actionInput.name = 'action';
+                    actionInput.value = 'archiver';
+                    form.appendChild(actionInput);
+
+                    const alerteIdInput = document.createElement('input');
+                    alerteIdInput.type = 'hidden';
+                    alerteIdInput.name = 'alerteId';
+                    alerteIdInput.value = alerteId;
+                    form.appendChild(alerteIdInput);
+
+                    // Ajouter le formulaire à la page et le soumettre
+                    document.body.appendChild(form);
+                    form.submit();
+                }
+            }
+
+            // Fonction pour tout marquer comme lu
+            function markAllAsRead() {
+                if (confirm('Marquer toutes les alertes comme lues ?')) {
+                    // Créer un formulaire pour envoyer la requête POST
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = '${pageContext.request.contextPath}/mes-alertes';
+
+                    // Ajouter les paramètres
+                    const actionInput = document.createElement('input');
+                    actionInput.type = 'hidden';
+                    actionInput.name = 'action';
+                    actionInput.value = 'tout-marquer-lu';
+                    form.appendChild(actionInput);
+
+                    // Ajouter le formulaire à la page et le soumettre
+                    document.body.appendChild(form);
+                    form.submit();
+                }
+            }
+        </script>
 </body>
 </html>

@@ -65,4 +65,67 @@ public class MesAlertesServlet extends HttpServlet {
             dispatcher.forward(request, response);
         }
     }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        System.out.println("=== POST MES ALERTES SERVLET ===");
+
+        try {
+            HttpSession session = request.getSession();
+            Utilisateur user = (Utilisateur) session.getAttribute("user");
+
+            if (user == null) {
+                response.sendRedirect(request.getContextPath() + "/login.jsp");
+                return;
+            }
+
+            String action = request.getParameter("action");
+            String alerteIdParam = request.getParameter("alerteId");
+
+            System.out.println("📝 Action: " + action + ", Alerte ID: " + alerteIdParam);
+
+            if (action != null && alerteIdParam != null) {
+                Long alerteId = Long.parseLong(alerteIdParam);
+                boolean success = false;
+
+                switch (action) {
+                    case "marquer-lue":
+                        success = alerteService.marquerCommeLue(alerteId, user.getIdUtilisateur());
+                        if (success) {
+                            request.getSession().setAttribute("success", "Alerte marquée comme lue !");
+                        } else {
+                            request.getSession().setAttribute("error", "Erreur lors du marquage de l'alerte");
+                        }
+                        break;
+
+                    case "archiver":
+                        success = alerteService.archiverAlerte(alerteId, user.getIdUtilisateur());
+                        if (success) {
+                            request.getSession().setAttribute("success", "Alerte archivée !");
+                        } else {
+                            request.getSession().setAttribute("error", "Erreur lors de l'archivage de l'alerte");
+                        }
+                        break;
+
+                    case "tout-marquer-lu":
+                        success = alerteService.toutMarquerCommeLu(user.getIdUtilisateur());
+                        if (success) {
+                            request.getSession().setAttribute("success", "Toutes les alertes marquées comme lues !");
+                        } else {
+                            request.getSession().setAttribute("error", "Erreur lors du marquage des alertes");
+                        }
+                        break;
+                }
+            }
+
+            // Rediriger vers la page des alertes
+            response.sendRedirect(request.getContextPath() + "/mes-alertes");
+
+        } catch (Exception e) {
+            System.out.println("❌ ERREUR POST: " + e.getMessage());
+            e.printStackTrace();
+            request.getSession().setAttribute("error", "Erreur: " + e.getMessage());
+            response.sendRedirect(request.getContextPath() + "/mes-alertes");
+        }
+    }
 }

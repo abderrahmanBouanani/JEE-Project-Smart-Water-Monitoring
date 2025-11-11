@@ -45,4 +45,35 @@ public class AlerteService implements IService<Alerte> {
     public int countUnreadByUserId(Long userId) {
         return alerteDao.findUnreadByUserId(userId).size();
     }
+
+    public boolean marquerCommeLue(Long alerteId, Long userId) {
+        Alerte alerte = findById(alerteId);
+        // Vérifier que l'alerte appartient bien à l'utilisateur
+        if (alerte != null && alerte.getUtilisateur().getIdUtilisateur().equals(userId)) {
+            alerte.setEstLue(true);
+            return update(alerte);
+        }
+        return false;
+    }
+
+    public boolean archiverAlerte(Long alerteId, Long userId) {
+        Alerte alerte = findById(alerteId);
+        // Vérifier que l'alerte appartient bien à l'utilisateur
+        if (alerte != null && alerte.getUtilisateur().getIdUtilisateur().equals(userId)) {
+            return delete(alerte);
+        }
+        return false;
+    }
+
+    public boolean toutMarquerCommeLu(Long userId) {
+        List<Alerte> alertesNonLues = findUnreadByUserId(userId);
+        boolean success = true;
+        for (Alerte alerte : alertesNonLues) {
+            alerte.setEstLue(true);
+            if (!update(alerte)) {
+                success = false;
+            }
+        }
+        return success;
+    }
 }
