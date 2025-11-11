@@ -16,41 +16,7 @@
             <div class="alert alert-danger">${error}</div>
         </c:if>
 
-        <!-- Statistiques -->
-        <div class="row mb-4">
-            <div class="col-md-3">
-                <div class="card text-white bg-primary">
-                    <div class="card-body text-center">
-                        <h5>Total</h5>
-                        <h2>${totalAlertes}</h2>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card text-white bg-warning">
-                    <div class="card-body text-center">
-                        <h5>Non lues</h5>
-                        <h2>${nonLuesCount}</h2>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card text-white bg-danger">
-                    <div class="card-body text-center">
-                        <h5>Critiques</h5>
-                        <h2>${critiquesCount}</h2>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card text-white bg-success">
-                    <div class="card-body text-center">
-                        <h5>Résolues</h5>
-                        <h2>${resoluesCount}</h2>
-                    </div>
-                </div>
-            </div>
-        </div>
+
 
         <!-- Liste des alertes -->
         <c:choose>

@@ -467,17 +467,7 @@
                 </a>
             </div>
 
-            <!-- Debug Info -->
-            <div class="mt-3">
-                <details>
-                    <summary class="text-muted small">Informations de débogage</summary>
-                    <div class="alert alert-info small mt-2">
-                        <strong>Alertes chargées:</strong> ${alertes.size()}<br>
-                        <strong>Session:</strong> ${sessionScope.user.nom} (${sessionScope.user.type})<br>
-                        <strong>Timestamp:</strong> <%= new java.util.Date() %>
-                    </div>
-                </details>
-            </div>
+
         </div>
     </div>
 

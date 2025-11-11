@@ -199,32 +199,7 @@
                     </div>
                 </div>
 
-                <!-- Carte de localisation (simplifiée) -->
-                <div class="row mt-4">
-                    <div class="col-12">
-                        <div class="network-card">
-                            <h5 class="card-title mb-3">
-                                <i class="fas fa-map me-2 text-info"></i>
-                                Localisation des Capteurs
-                            </h5>
 
-                            <div class="bg-light rounded p-4 text-center">
-                                <i class="fas fa-map-marked-alt fa-3x text-muted mb-3"></i>
-                                <h6 class="text-muted">Carte du réseau d'eau</h6>
-                                <p class="text-muted mb-0">
-                                    <c:choose>
-                                        <c:when test="${not empty capteurs && capteurs.size() > 0}">
-                                            Votre réseau compte ${capteurs.size()} capteurs répartis dans différents emplacements.
-                                        </c:when>
-                                        <c:otherwise>
-                                            Aucun capteur à afficher sur la carte.
-                                        </c:otherwise>
-                                    </c:choose>
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </main>
 
 
