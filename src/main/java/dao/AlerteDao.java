@@ -21,9 +21,11 @@ public class AlerteDao extends AbstractDao<Alerte> {
             session = HibernateUtil.getSessionFactory().openSession();
             tx = session.beginTransaction();
 
-            // ✅ Utiliser JOIN FETCH pour charger l'utilisateur
-            String query = "SELECT a FROM Alerte a " +
+            // ✅ Utiliser JOIN FETCH pour charger toutes les relations nécessaires
+            String query = "SELECT DISTINCT a FROM Alerte a " +
                     "JOIN FETCH a.utilisateur u " +
+                    "LEFT JOIN FETCH a.donneeCapteur dc " +
+                    "LEFT JOIN FETCH dc.capteur " +
                     "WHERE u.idUtilisateur = :userId " +
                     "ORDER BY a.dateCreation DESC";
 
@@ -53,8 +55,10 @@ public class AlerteDao extends AbstractDao<Alerte> {
             session = HibernateUtil.getSessionFactory().openSession();
             tx = session.beginTransaction();
 
-            String query = "SELECT a FROM Alerte a " +
+            String query = "SELECT DISTINCT a FROM Alerte a " +
                     "JOIN FETCH a.utilisateur u " +
+                    "LEFT JOIN FETCH a.donneeCapteur dc " +
+                    "LEFT JOIN FETCH dc.capteur " +
                     "WHERE u.idUtilisateur = :userId AND a.estLue = false " +
                     "ORDER BY a.dateCreation DESC";
 
@@ -85,18 +89,26 @@ public class AlerteDao extends AbstractDao<Alerte> {
             session = HibernateUtil.getSessionFactory().openSession();
             tx = session.beginTransaction();
 
+            // Charger toutes les relations nécessaires avec JOIN FETCH pour éviter LazyInitializationException
             list = session.createQuery(
-                            "SELECT a FROM Alerte a JOIN FETCH a.utilisateur ORDER BY a.dateCreation DESC",
+                            "SELECT DISTINCT a FROM Alerte a " +
+                            "LEFT JOIN FETCH a.utilisateur " +
+                            "LEFT JOIN FETCH a.donneeCapteur dc " +
+                            "LEFT JOIN FETCH dc.capteur " +
+                            "ORDER BY a.dateCreation DESC",
                             Alerte.class)
                     .list();
 
             tx.commit();
+            System.out.println("✅ AlerteDao - Toutes les alertes récupérées: " + (list != null ? list.size() : 0) + " alertes");
         } catch (HibernateException e) {
             if (tx != null) tx.rollback();
+            System.err.println("❌ Erreur AlerteDao.findAll: " + e.getMessage());
             e.printStackTrace();
+            return new java.util.ArrayList<>(); // Retourner une liste vide plutôt que null
         } finally {
             if (session != null) session.close();
         }
-        return list;
+        return list != null ? list : new java.util.ArrayList<>();
     }
 }

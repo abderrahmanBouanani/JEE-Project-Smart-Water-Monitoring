@@ -11,7 +11,7 @@ public class Alerte {
     private Long idAlerte;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20)
+    @Column(nullable = true, length = 20)
     private TypeAlerte type;
 
     @Column(nullable = false)

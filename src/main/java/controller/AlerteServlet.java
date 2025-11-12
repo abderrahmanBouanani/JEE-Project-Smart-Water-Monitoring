@@ -114,18 +114,29 @@ public class AlerteServlet extends HttpServlet {
     }
 
     private void listAlertes(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        System.out.println("=== DEBUG ALERTE SERVLET - LIST ===");
         try {
+            System.out.println("📦 Récupération de toutes les alertes...");
             List<Alerte> alertes = alerteService.findAll();
+            
             if (alertes == null) {
+                System.out.println("⚠️ alerteService.findAll() a retourné null");
                 alertes = new java.util.ArrayList<>();
+            } else {
+                System.out.println("✅ " + alertes.size() + " alertes récupérées");
             }
+            
             request.setAttribute("alertes", alertes);
+            System.out.println("🚀 Forward vers la JSP...");
             RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/views/alerte/list.jsp");
             dispatcher.forward(request, response);
+            System.out.println("✅ Forward réussi");
         } catch (Exception e) {
-            System.err.println("Error listing alertes: " + e.getMessage());
+            System.err.println("❌ ERREUR dans listAlertes: " + e.getClass().getName());
+            System.err.println("❌ Message: " + e.getMessage());
+            System.err.println("❌ Stack trace:");
             e.printStackTrace();
-            request.setAttribute("error", "Erreur lors du chargement des alertes");
+            request.setAttribute("error", "Erreur lors du chargement des alertes: " + e.getMessage());
             request.setAttribute("alertes", new java.util.ArrayList<>());
             RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/views/alerte/list.jsp");
             dispatcher.forward(request, response);

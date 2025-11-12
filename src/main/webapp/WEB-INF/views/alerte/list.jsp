@@ -339,10 +339,13 @@
                             <tr class="${alerte.estLue ? '' : 'alerte-non-lue'}"
                                 data-statut="${alerte.estLue ? 'lue' : 'non-lue'}"
                                 data-urgence="${alerte.niveauUrgence}"
-                                data-type="${alerte.type}">
+                                data-type="${alerte.type != null ? alerte.type : 'NON_DEFINI'}">
                                 <td><strong>#${alerte.idAlerte}</strong></td>
                                 <td>
                                     <c:choose>
+                                        <c:when test="${alerte.type == null}">
+                                            <span class="badge bg-secondary">Type non défini</span>
+                                        </c:when>
                                         <c:when test="${alerte.type == 'SEUIL_DEPASSE'}">
                                             <span class="badge bg-warning">Seuil dépassé</span>
                                         </c:when>

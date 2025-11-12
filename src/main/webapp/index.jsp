@@ -1,5 +1,12 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%
+    // Redirection vers login si l'utilisateur n'est pas connecté
+    if (session.getAttribute("user") == null) {
+        response.sendRedirect(request.getContextPath() + "/login.jsp");
+        return;
+    }
+%>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -192,6 +199,19 @@
                             <h5 class="fw-bold mb-2">Gérer les Capteurs IoT</h5>
                             <p class="text-muted mb-0 small">
                                 Configuration des capteurs connectés
+                            </p>
+                        </a>
+                    </div>
+
+                    <!-- Agrégation des Données -->
+                    <div class="col-md-6 col-lg-4">
+                        <a href="${pageContext.request.contextPath}/admin/aggregation" class="management-card">
+                            <div class="card-icon bg-primary bg-opacity-10 text-primary">
+                                <i class="fas fa-database"></i>
+                            </div>
+                            <h5 class="fw-bold mb-2">Agrégation des Données</h5>
+                            <p class="text-muted mb-0 small">
+                                Gestion de l'agrégation automatique
                             </p>
                         </a>
                     </div>
