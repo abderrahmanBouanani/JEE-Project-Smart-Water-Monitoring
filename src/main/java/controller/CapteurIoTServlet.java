@@ -14,6 +14,7 @@ import model.TypeUtilisateur;
 import services.CapteurIoTService;
 import services.UtilisateurService;
 import services.DonneeCapteurService;
+import util.EnumUtil;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -189,7 +190,7 @@ public class CapteurIoTServlet extends HttpServlet {
 
             // Récupération des paramètres
             String reference = request.getParameter("reference");
-            TypeCapteur type = TypeCapteur.valueOf(request.getParameter("type"));
+            TypeCapteur type = EnumUtil.parseEnum(TypeCapteur.class, request.getParameter("type"), TypeCapteur.DEBIT_EAU);
             String emplacement = request.getParameter("emplacement");
             boolean etat = "on".equals(request.getParameter("etat"));
             double seuilAlerte = Double.parseDouble(request.getParameter("seuilAlerte"));

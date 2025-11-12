@@ -67,7 +67,21 @@ public class VisualisationServlet extends HttpServlet {
         } catch (Exception e) {
             System.out.println("❌ ERREUR Visualisation: " + e.getMessage());
             e.printStackTrace();
-            request.setAttribute("error", "Erreur lors du chargement de la visualisation: " + e.getMessage());
+
+            String errorMessage = "Erreur lors du chargement de la visualisation: " + e.getMessage();
+
+            // Améliorer le message d'erreur pour les erreurs enum
+            if (e.getMessage() != null && e.getMessage().contains("enum constant")) {
+                errorMessage = "Erreur: Les données des capteurs contiennent des valeurs invalides. " +
+                              "Veuillez contacter l'administrateur pour corriger la base de données.";
+                System.out.println("⚠️ Erreur enum détectée - Base de données corrompue");
+            }
+
+            request.setAttribute("error", errorMessage);
+            request.setAttribute("capteurs", new java.util.ArrayList<>());
+            request.setAttribute("dernieresDonnees", new java.util.ArrayList<>());
+            request.setAttribute("userId", null);
+
             RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/views/citizen/visualisation.jsp");
             dispatcher.forward(request, response);
         }

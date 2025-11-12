@@ -17,16 +17,33 @@ public class CapteurIoTDao extends AbstractDao<CapteurIoT> {
     public List<CapteurIoT> findAll() {
         Session session = null;
         Transaction tx = null;
-        List<CapteurIoT> list = null;
+        List<CapteurIoT> list = new java.util.ArrayList<>();
         try {
             session = HibernateUtil.getSessionFactory().openSession();
             tx = session.beginTransaction();
             // Utilisation de JOIN FETCH pour charger l'utilisateur associé
             list = session.createQuery("FROM CapteurIoT c JOIN FETCH c.utilisateur", CapteurIoT.class).list();
             tx.commit();
-        } catch (HibernateException e) {
+        } catch (Exception e) {
             if (tx != null) tx.rollback();
-            e.printStackTrace();
+            System.out.println("❌ Erreur CapteurIoTDao.findAll(): " + e.getMessage());
+            // Si erreur enum, essayer sans JOIN FETCH
+            if (e.getMessage() != null && e.getMessage().contains("enum constant")) {
+                System.out.println("⚠️ Erreur enum détectée - tentative de récupération alternative");
+                try {
+                    Session session2 = HibernateUtil.getSessionFactory().openSession();
+                    Transaction tx2 = session2.beginTransaction();
+                    list = session2.createQuery("FROM CapteurIoT c", CapteurIoT.class).list();
+                    tx2.commit();
+                    session2.close();
+                    System.out.println("✅ Données récupérées avec requête alternative");
+                } catch (Exception e2) {
+                    System.out.println("❌ Erreur même avec requête alternative");
+                    e2.printStackTrace();
+                }
+            } else {
+                e.printStackTrace();
+            }
         } finally {
             if (session != null) session.close();
         }
@@ -37,7 +54,7 @@ public class CapteurIoTDao extends AbstractDao<CapteurIoT> {
     public List<CapteurIoT> findByUserId(Long userId) {
         Session session = null;
         Transaction tx = null;
-        List<CapteurIoT> list = null;
+        List<CapteurIoT> list = new java.util.ArrayList<>();
         try {
             session = HibernateUtil.getSessionFactory().openSession();
             tx = session.beginTransaction();
@@ -54,10 +71,30 @@ public class CapteurIoTDao extends AbstractDao<CapteurIoT> {
             tx.commit();
             System.out.println("✅ CapteurIoTDao - Capteurs récupérés pour userId " + userId + ": " + list.size() + " capteurs");
 
-        } catch (HibernateException e) {
+        } catch (Exception e) {
             if (tx != null) tx.rollback();
             System.out.println("❌ Erreur CapteurIoTDao.findByUserId: " + e.getMessage());
-            e.printStackTrace();
+            // Si l'erreur vient d'une valeur enum invalide, essayer de récupérer sans filtrage JOIN
+            if (e.getMessage() != null && e.getMessage().contains("enum constant")) {
+                System.out.println("⚠️ Erreur enum détectée - tentative de récupération alternative");
+                try {
+                    Session session2 = HibernateUtil.getSessionFactory().openSession();
+                    Transaction tx2 = session2.beginTransaction();
+                    list = session2.createQuery(
+                            "SELECT c FROM CapteurIoT c WHERE c.utilisateur.idUtilisateur = :userId ORDER BY c.dateInstallation DESC",
+                            CapteurIoT.class)
+                            .setParameter("userId", userId)
+                            .list();
+                    tx2.commit();
+                    session2.close();
+                    System.out.println("✅ Données récupérées avec requête alternative");
+                } catch (Exception e2) {
+                    System.out.println("❌ Erreur même avec requête alternative");
+                    e2.printStackTrace();
+                }
+            } else {
+                e.printStackTrace();
+            }
         } finally {
             if (session != null) session.close();
         }
