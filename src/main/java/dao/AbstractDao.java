@@ -38,8 +38,13 @@ public abstract class AbstractDao<T> implements IDao<T> {
             tx = session.beginTransaction();
             list = session.createQuery("from " + entityClass.getSimpleName()).list();
             tx.commit();
-        } catch (HibernateException e) {
+        } catch (Exception e) {
             if (tx != null) tx.rollback();
+            // Log the exception for debugging
+            System.err.println("Error fetching all " + entityClass.getSimpleName() + ": " + e.getMessage());
+            e.printStackTrace();
+            // Return an empty list instead of null to prevent NPE
+            list = new java.util.ArrayList<>();
         } finally {
             if (session != null) session.close();
         }
@@ -86,6 +91,30 @@ public abstract class AbstractDao<T> implements IDao<T> {
             if (session != null) session.close();
         }
         return status;
+    }
+
+    public List<T> findByUserId(Long userId) {
+        Session session = null;
+        Transaction tx = null;
+        List<T> list = null;
+        try {
+            session = HibernateUtil.getSessionFactory().openSession();
+            tx = session.beginTransaction();
+
+            // Requête générique pour les entités qui ont une relation "utilisateur"
+            String query = "FROM " + entityClass.getSimpleName() + " WHERE utilisateur.idUtilisateur = :userId";
+            list = session.createQuery(query, entityClass)
+                    .setParameter("userId", userId)
+                    .list();
+
+            tx.commit();
+        } catch (HibernateException e) {
+            if (tx != null) tx.rollback();
+            e.printStackTrace();
+        } finally {
+            if (session != null) session.close();
+        }
+        return list;
     }
 
     @FunctionalInterface

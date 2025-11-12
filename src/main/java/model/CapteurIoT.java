@@ -1,6 +1,6 @@
 package model;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.time.LocalDate;
 
 @Entity
@@ -22,6 +22,7 @@ public class CapteurIoT {
 
     private boolean etat;
 
+    @Temporal(TemporalType.DATE)
     private LocalDate dateInstallation;
 
     private double seuilAlerte;

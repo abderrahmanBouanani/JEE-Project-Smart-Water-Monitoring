@@ -1,0 +1,44 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!DOCTYPE hibernate-configuration PUBLIC
+        "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+<hibernate-configuration>
+    <session-factory>
+        <!-- Database connection settings -->
+        <property name="connection.driver_class">com.mysql.cj.jdbc.Driver</property>
+        
+        <!-- JDBC connection URL with zeroDateTimeBehavior to handle zero dates in MySQL 8 -->
+        <!-- Remplacez les valeurs suivantes par vos propres paramètres -->
+        <property name="connection.url">jdbc:mysql://localhost:3306/YOUR_DATABASE_NAME?zeroDateTimeBehavior=convertToNull&amp;serverTimezone=UTC&amp;useSSL=false</property>
+        <property name="connection.username">YOUR_USERNAME</property>
+        <property name="connection.password">YOUR_PASSWORD</property>
+
+        <!-- JDBC connection pool -->
+        <property name="connection.pool_size">10</property>
+
+        <!-- SQL dialect for MySQL 8 -->
+        <property name="dialect">org.hibernate.dialect.MySQL8Dialect</property>
+
+        <!-- Echo SQL to console (set to false in production) -->
+        <property name="show_sql">false</property>
+
+        <!-- Format SQL output -->
+        <property name="format_sql">false</property>
+
+        <!-- Enable Hibernate statistics (set to false in production) -->
+        <property name="generate_statistics">false</property>
+
+        <!-- Schema generation strategy: update, create, create-drop, validate -->
+        <property name="hbm2ddl.auto">update</property>
+
+        <!-- Mapped entity classes -->
+        <mapping class="model.Utilisateur"/>
+        <mapping class="model.CapteurIoT"/>
+        <mapping class="model.DonneeCapteur"/>
+        <mapping class="model.Alerte"/>
+        <mapping class="model.ObjectifConsommation"/>
+        <mapping class="model.HistoriqueConsommation"/>
+        <mapping class="model.Statistique"/>
+
+    </session-factory>
+</hibernate-configuration>
