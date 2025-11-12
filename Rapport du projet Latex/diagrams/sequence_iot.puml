@@ -1,0 +1,52 @@
+@startuml sequence_iot
+!theme plain
+title Diagramme de séquence : Collecte des données IoT
+
+participant "Simulateur IoT" as IoT
+participant "API REST" as API
+participant "Service" as Service
+participant "DAO" as DAO
+participant "Base de Données" as DB
+
+loop Toutes les 60 secondes
+    IoT -> API: POST /api/waterdata\n{capteurId, valeur}
+    activate API
+    
+    API -> API: Valider JSON et champs
+    
+    alt Données valides
+        API -> Service: Créer DonneeCapteur
+        activate Service
+        
+        Service -> DAO: Persister donnée
+        activate DAO
+        
+        DAO -> DB: INSERT donnees_capteurs
+        activate DB
+        DB --> DAO: OK
+        deactivate DB
+        
+        DAO --> Service: Succès
+        deactivate DAO
+        
+        Service -> Service: Vérifier seuils\n(détection fuite > 40 L/min)
+        
+        Service --> API: Données sauvegardées
+        deactivate Service
+        
+        API --> IoT: HTTP 200 OK\n{status: success}
+        
+    else Données invalides
+        API --> IoT: HTTP 400 Bad Request
+    end
+    
+    deactivate API
+    
+    note over IoT, DB
+        **Performance :** < 500ms
+        **Débit :** 1000+ capteurs/60s
+    end note
+    
+end
+
+@enduml

@@ -1,40 +1,76 @@
 \chapter*{\center{Introduction Générale}}
 \addcontentsline{toc}{chapter}{Introduction Générale}
 
-Cette section introductive propose une vision globale du projet et des travaux qui y sont associés. 
-De manière générale, plusieurs éléments y sont abordés :
+\section*{Contexte et champ d'application}
+
+L'eau représente une ressource vitale dont la gestion durable constitue l'un des défis majeurs du XXIe siècle. Selon le rapport des Nations Unies sur le développement des ressources en eau \cite{un2023water}, près de 2 milliards de personnes vivent dans des pays souffrant de stress hydrique, et cette situation ne cesse de s'aggraver avec la croissance démographique et le changement climatique. L'Organisation Mondiale de la Santé \cite{who2022water} souligne l'importance d'une surveillance continue et d'une gestion intelligente des ressources en eau pour garantir l'accès à l'eau potable et prévenir le gaspillage.
+
+Dans ce contexte, l'Internet des Objets (IoT) et les technologies de l'information offrent des opportunités sans précédent pour révolutionner la gestion de l'eau. Les systèmes de supervision intelligente permettent de collecter, analyser et exploiter des données en temps réel pour optimiser la consommation, détecter les anomalies et sensibiliser les utilisateurs \cite{iot2020water}. Ces solutions technologiques s'inscrivent dans une démarche de développement durable et de transformation numérique des infrastructures urbaines.
+
+\section*{Description du problème}
+
+La gestion traditionnelle de la consommation d'eau présente plusieurs limitations majeures. Les relevés manuels des compteurs sont coûteux, peu fréquents et sujets aux erreurs humaines. L'absence de données en temps réel empêche la détection précoce des fuites et des surconsommations, entraînant un gaspillage considérable de ressources. Les consommateurs manquent de visibilité sur leurs habitudes de consommation et ne disposent pas d'outils pour optimiser leur usage de l'eau.
+
+De plus, les gestionnaires de réseaux d'eau font face à des défis opérationnels importants : difficulté de prévision de la demande, réactivité insuffisante face aux incidents, et manque d'outils d'analyse pour la prise de décision stratégique. Ces problématiques nécessitent le développement d'une plateforme numérique capable d'intégrer des capteurs IoT, de traiter les données en temps réel, et de fournir des tableaux de bord interactifs pour tous les acteurs du système.
+
+\section*{Objectifs du projet}
+
+Le projet \textbf{Smart Water Monitoring System} vise à concevoir et développer une plateforme web complète de supervision intelligente de la consommation d'eau. Les objectifs spécifiques sont les suivants :
 
 \begin{itemize}
-
-    \item \textbf{Contexte et champ d’application} : un aperçu du cadre dans lequel s’inscrit le projet 
-    (théories, systèmes, algorithmes, applications concrètes, etc.), permettant de bien cerner les enjeux 
-    et la pertinence du travail à réaliser.
+    \item \textbf{Collecte et traitement des données IoT} : Intégrer un réseau de capteurs virtuels simulant des dispositifs IoT réels pour collecter les données de consommation d'eau en temps réel et les transmettre au système central.
     
-    \item \textbf{Description du problème} : une présentation succincte de la thématique ou de la question 
-    étudiée, en soulignant l’importance du sujet et les difficultés potentielles.
-
-
-    \item \textbf{Objectifs du projet} : la définition des buts visés — ce qui doit être accompli ou 
-    démontré à la fin de l’étude ou du développement. Il peut s’agir de résoudre une problématique, 
-    de concevoir un prototype, de réaliser une expérience, etc.
-
-    \item \textbf{Approche et méthodologie} : la façon dont le problème sera traité ; il peut s’agir 
-    de techniques d’implémentation, de protocoles expérimentaux ou de méthodes théoriques. 
-
-    \item \textbf{Résultats et interprétations attendus} : un bref résumé des conclusions majeures 
-    ou des retombées espérées (efficacité, performance, validation, etc.), sans toutefois rentrer 
-    dans les détails.
-
-    \item \textbf{Organisation du rapport} : un aperçu du contenu des chapitres à venir, afin de 
-    guider le lecteur dans la structure globale du document.
+    \item \textbf{Gestion multi-utilisateurs} : Développer un système d'authentification et d'autorisation sécurisé permettant de gérer différents profils (citoyens, administrateurs) avec des droits d'accès adaptés.
+    
+    \item \textbf{Visualisation et analyse} : Créer des tableaux de bord interactifs offrant une visualisation intuitive de la consommation, des tendances historiques, et des statistiques agrégées.
+    
+    \item \textbf{Système d'alertes intelligent} : Implémenter un mécanisme de détection automatique des anomalies (fuites, surconsommation) et de notification en temps réel des utilisateurs et des administrateurs.
+    
+    \item \textbf{Optimisation et objectifs de consommation} : Permettre aux utilisateurs de définir des objectifs de consommation personnalisés et de suivre leurs progrès vers une utilisation plus responsable de l'eau.
 \end{itemize}
 
-\noindent
-Il est fortement recommandé de \textbf{consulter votre encadrant} pour valider le contenu et 
-l’étendue de cette introduction, car la forme et la longueur de celle-ci peuvent varier selon 
-le type de projet (développement d’application, analyse algorithmique, travaux expérimentaux, 
-approche théorique, etc.) et selon les préférences individuelles. 
+\section*{Approche et méthodologie}
 
-Dans tous les cas, l’introduction doit fournir au lecteur \textbf{un cadre clair} sur la 
-problématique, la démarche et les objectifs poursuivis, tout en donnant envie de découvrir 
-la suite du rapport.
+Pour réaliser ce projet, nous avons adopté une approche structurée basée sur les technologies Jakarta EE et les meilleures pratiques du développement logiciel. L'architecture du système repose sur le modèle MVC (Model-View-Controller) implémenté avec Jakarta Servlet \cite{jakarta2021spec} pour la couche de contrôle, Hibernate ORM \cite{bauer2007hibernate} pour la persistance des données, et MySQL 8 \cite{mysql2023reference} comme système de gestion de base de données.
+
+La sécurité constitue une préoccupation centrale du projet. Nous utilisons l'algorithme BCrypt \cite{bcrypt2024security} pour le hachage sécurisé des mots de passe, garantissant ainsi la protection des données sensibles des utilisateurs. Un système de filtres d'authentification contrôle l'accès aux ressources protégées et assure la séparation des privilèges entre les différents types d'utilisateurs.
+
+Pour la simulation des capteurs IoT, nous avons développé un simulateur en Python qui génère des données réalistes de consommation d'eau en tenant compte des patterns horaires (heures de pointe, heures creuses) et qui communique avec le backend Java via des API REST. Cette approche permet de tester l'ensemble du système dans des conditions proches de la réalité sans nécessiter de matériel IoT physique.
+
+La gestion du projet suit la méthodologie agile Scrum \cite{schwaber2020scrum}, avec des sprints de 2 à 3 semaines permettant une livraison incrémentale des fonctionnalités et une adaptation continue aux retours d'expérience.
+
+\section*{Résultats et interprétations attendus}
+
+À l'issue de ce projet, nous attendons de livrer une plateforme web fonctionnelle et opérationnelle capable de gérer l'ensemble du cycle de vie des données de consommation d'eau. Les résultats escomptés incluent :
+
+\begin{itemize}
+    \item Un système robuste de collecte et de stockage de données IoT avec une latence minimale et une haute disponibilité.
+    \item Des interfaces utilisateur intuitives et responsives offrant une expérience utilisateur optimale sur différents supports (ordinateurs, tablettes, smartphones).
+    \item Un système d'alertes efficace permettant la détection précoce des anomalies avec un taux de faux positifs maîtrisé.
+    \item Des fonctionnalités d'analyse et de reporting fournissant des insights actionnables pour optimiser la consommation d'eau.
+    \item Un code source bien structuré, documenté et testable, facilitant la maintenance et l'évolution future du système.
+\end{itemize}
+
+Ce projet démontre l'applicabilité des technologies Jakarta EE dans le contexte des systèmes IoT et illustre comment une approche orientée objet et une architecture en couches peuvent contribuer à développer des applications d'entreprise scalables et maintenables.
+
+\section*{Organisation du rapport}
+
+Le présent rapport est structuré en plusieurs chapitres complémentaires permettant une compréhension progressive du projet :
+
+\begin{description}
+    \item[Chapitre 1 -- Contexte général du projet :] Présente le cadre du projet, la problématique abordée, les objectifs visés et la démarche de gestion adoptée.
+    
+    \item[Chapitre 2 -- Étude préliminaire :] Détaille les concepts théoriques fondamentaux (technologies JEE, Hibernate, IoT) et l'analyse de l'état de l'art des solutions existantes.
+    
+    \item[Chapitre 3 -- Analyse et spécification des besoins :] Décrit les besoins fonctionnels et non fonctionnels du système, ainsi que les cas d'utilisation identifiés.
+    
+    \item[Chapitre 4 -- Conception de la solution :] Expose l'architecture globale du système, les diagrammes UML (classes, séquence, déploiement) et les choix de conception.
+    
+    \item[Chapitre 5 -- Réalisation et implémentation :] Présente les aspects techniques de l'implémentation, les extraits de code significatifs et les défis techniques rencontrés.
+    
+    \item[Chapitre 6 -- Tests et validation :] Décrit la stratégie de tests mise en œuvre (tests unitaires, tests d'intégration) et les résultats obtenus.
+    
+    \item[Chapitre 7 -- Conclusion et perspectives :] Synthétise les réalisations du projet, évalue l'atteinte des objectifs et propose des pistes d'amélioration future.
+\end{description}
+
+Ce rapport vise à fournir une vision complète et détaillée du projet, depuis sa conception initiale jusqu'à sa réalisation concrète, en mettant en lumière les choix techniques, les défis rencontrés et les solutions apportées.

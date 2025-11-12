@@ -1,0 +1,577 @@
+\chapter{Analyse et spécification des besoins}
+
+\section{Introduction}
+
+L'analyse des besoins constitue une étape fondamentale du processus de développement logiciel. Ce chapitre décrit en détail les exigences fonctionnelles et non fonctionnelles du système \textbf{Smart Water Monitoring System}. Il poursuit l'étude préliminaire en approfondissant la spécification de chaque cas d'utilisation, en détaillant les flux de données, et en formalisant les critères d'acceptation. Cette analyse sert de base de référence pour la phase de conception et de validation ultérieure.
+
+\section{Acteurs du système}
+
+Les acteurs représentent les entités (utilisateurs humains ou systèmes externes) qui interagissent avec le système. Le tableau \ref{tab:acteurs_details} détaille les caractéristiques de chaque acteur.
+
+\begin{table}[ht]
+\centering
+\caption{Acteurs du système Smart Water Monitoring et leurs caractéristiques.}
+\label{tab:acteurs_details}
+\begin{tabular}{|l|p{3cm}|p{4cm}|p{3cm}|}
+\hline
+\textbf{Acteur} & \textbf{Type} & \textbf{Objectif principal} & \textbf{Fréquence} \\ \hline
+Citoyen & Utilisateur humain & Suivre consommation, réduire gaspillage & Quotidienne \\ \hline
+Administrateur & Utilisateur humain & Superviser réseau, diagnostiquer anomalies & Quotidienne \\ \hline
+Capteur IoT & Système externe & Collecter données consommation & Toutes les 60s \\ \hline
+Job planifié & Système automatisé & Agréger données quotidiennement & 1 fois/jour \\ \hline
+\end{tabular}
+\end{table}
+
+\subsection{Citoyen}
+
+Le citoyen est un utilisateur final qui dispose d'un ou plusieurs compteurs d'eau connectés à son domicile ou son entreprise. Son objectif est d'avoir une visibilité complète sur sa consommation d'eau et de réduire son gaspillage à travers des alertes et des recommandations basées sur des données précises. Un citoyen peut :
+
+\begin{itemize}
+    \item Créer un compte personnel avec email et mot de passe.
+    \item Consulter sa consommation en temps réel via un dashboard intuitif.
+    \item Examiner l'historique détaillé avec graphiques (par jour, semaine, mois, année).
+    \item Définir et suivre des objectifs de consommation mensuels.
+    \item Recevoir et consulter les alertes de fuite ou surconsommation.
+    \item Gérer ses paramètres de profil et préférences.
+\end{itemize}
+
+\subsection{Administrateur}
+
+L'administrateur est un gestionnaire du réseau d'eau responsable de la supervision globale du système. Son objectif est de monitorer la santé du réseau, d'identifier les anomalies, de gérer les ressources et d'optimiser la distribution d'eau. Un administrateur peut :
+
+\begin{itemize}
+    \item Accéder à un dashboard d'administration avec statistiques globales.
+    \item Consulter et filtrer la liste des utilisateurs et leurs données de consommation.
+    \item Ajouter, modifier, supprimer et gérer l'état des capteurs IoT.
+    \item Configurer les seuils d'alerte et les types d'alertes disponibles.
+    \item Générer des rapports de consommation et diagnostiques.
+    \item Consulter les logs d'audit du système.
+\end{itemize}
+
+\subsection{Systèmes externes}
+
+\subsubsection{Capteurs IoT}
+
+Les capteurs IoT sont des dispositifs (simulés ou réels) qui envoient périodiquement des données de consommation d'eau au système backend via une API REST. Le système doit supporter un volume de 1000+ capteurs actifs en simultané avec une latence d'API < 500 ms.
+
+\subsubsection{Job d'agrégation}
+
+Un job planifié \texttt{DailyAggregationJob} s'exécute automatiquement chaque jour à 00:30 pour calculer les statistiques quotidiennes, agréger les données brutes et générer les alertes récurrentes.
+
+\section{Spécification détaillée des besoins fonctionnels}
+
+\subsection{BF1 - Gestion des comptes utilisateurs}
+
+\subsubsection{UC-01 : Inscription d'un nouvel utilisateur}
+
+\textbf{Acteur primaire} : Citoyen (nouveau)
+
+\textbf{Préconditions} :
+\begin{itemize}
+    \item L'utilisateur dispose d'une adresse email valide et unique.
+    \item L'utilisateur n'a pas encore de compte dans le système.
+\end{itemize}
+
+\textbf{Flux principal} :
+\begin{enumerate}
+    \item L'utilisateur accède à la page \texttt{/signup.jsp}.
+    \item L'utilisateur remplit le formulaire : nom, email, mot de passe, confirmation mot de passe, adresse.
+    \item Le système valide :
+    \begin{itemize}
+        \item Format de l'email (regex : \texttt{[a-zA-Z0-9.\_\%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]\{2,\}}).
+        \item Force du mot de passe (minimum 8 caractères).
+        \item Unicité de l'email (pas de doublon).
+        \item Remplissage des champs obligatoires.
+    \end{itemize}
+    \item Le système hache le mot de passe avec BCrypt (12 rounds).
+    \item Le système crée l'utilisateur en base de données avec \texttt{type = CITOYEN}.
+    \item Le système envoie un message de confirmation.
+    \item L'utilisateur est redirigé vers la page de connexion.
+\end{enumerate}
+
+\textbf{Flux alternatif} :
+\begin{itemize}
+    \item Si l'email existe déjà : afficher ``Cet email est déjà utilisé''.
+    \item Si le mot de passe est faible : afficher ``Le mot de passe doit contenir au moins 8 caractères''.
+    \item Si les mots de passe ne correspondent pas : afficher ``Les mots de passe ne correspondent pas''.
+    \item Si une erreur base de données : afficher ``Une erreur est survenue, veuillez réessayer plus tard''.
+\end{itemize}
+
+\textbf{Postconditions} :
+\begin{itemize}
+    \item L'utilisateur est créé avec le rôle CITOYEN.
+    \item Le mot de passe est hachés et stocké de manière sécurisée.
+    \item L'utilisateur peut maintenant se connecter.
+\end{itemize}
+
+\textbf{Critères d'acceptation} :
+\begin{itemize}
+    \item ✓ Inscription réussie en < 2 secondes.
+    \item ✓ Validation correcte des emails.
+    \item ✓ Mot de passe hashé avec BCrypt 12 rounds.
+    \item ✓ Messages d'erreur clairs et informatifs.
+\end{itemize}
+
+\subsubsection{UC-02 : Authentification}
+
+\textbf{Acteur primaire} : Citoyen, Administrateur
+
+\textbf{Préconditions} :
+\begin{itemize}
+    \item L'utilisateur dispose d'un compte valide dans le système.
+    \item L'utilisateur n'est pas déjà authentifié.
+\end{itemize}
+
+\textbf{Flux principal} :
+\begin{enumerate}
+    \item L'utilisateur accède à \texttt{/login.jsp}.
+    \item L'utilisateur entre son email et mot de passe.
+    \item Le système récupère l'utilisateur par email (\texttt{UtilisateurService.findByEmail()}).
+    \item Le système compare le mot de passe saisi avec le hash stocké via BCrypt (\texttt{SecurityUtil.checkPassword()}).
+    \item Si correspondance : le système crée une session HTTP sécurisée avec l'objet \texttt{Utilisateur} en attribut.
+    \item Le système redirige vers le dashboard approprié :
+    \begin{itemize}
+        \item CITOYEN $\Rightarrow$ \texttt{/dashboard}
+        \item ADMINISTRATEUR $\Rightarrow$ \texttt{/index.jsp}
+    \end{itemize}
+\end{enumerate}
+
+\textbf{Flux alternatif} :
+\begin{itemize}
+    \item Si l'email n'existe pas : afficher ``Email introuvable''.
+    \item Si le mot de passe est incorrect : afficher ``Mot de passe incorrect''.
+    \item Si le compte est désactivé : afficher ``Compte suspendu, contactez l'administrateur''.
+\end{itemize}
+
+\textbf{Postconditions} :
+\begin{itemize}
+    \item L'utilisateur dispose d'une session valide.
+    \item La session contient les informations de l'utilisateur (id, email, rôle).
+    \item Les filtres de sécurité peuvent vérifier l'authentification.
+\end{itemize}
+
+\textbf{Critères d'acceptation} :
+\begin{itemize}
+    \item ✓ Authentification en < 500 ms.
+    \item ✓ Redirection correcte selon le rôle.
+    \item ✓ Session persistante pendant 30 minutes d'inactivité (configurable).
+    \item ✓ Impossible de forcer l'accès sans authentification.
+\end{itemize}
+
+\subsubsection{UC-03 : Déconnexion}
+
+\textbf{Acteur primaire} : Citoyen, Administrateur
+
+\textbf{Préconditions} :
+\begin{itemize}
+    \item L'utilisateur est authentifié et dispose d'une session valide.
+\end{itemize}
+
+\textbf{Flux principal} :
+\begin{enumerate}
+    \item L'utilisateur clique sur le bouton « Déconnexion ».
+    \item Le système invalide la session HTTP courante.
+    \item L'utilisateur est redirigé vers \texttt{/login.jsp}.
+\end{enumerate}
+
+\textbf{Postconditions} :
+\begin{itemize}
+    \item La session est détruite.
+    \item L'utilisateur n'a plus accès aux ressources protégées.
+\end{itemize}
+
+\subsection{BF2 - Gestion de la consommation (Citoyen)}
+
+\subsubsection{UC-04 : Visualiser la consommation en temps réel}
+
+\textbf{Acteur primaire} : Citoyen
+
+\textbf{Préconditions} :
+\begin{itemize}
+    \item L'utilisateur est authentifié.
+    \item L'utilisateur dispose d'au moins un capteur actif.
+\end{itemize}
+
+\textbf{Flux principal} :
+\begin{enumerate}
+    \item L'utilisateur accède au dashboard \texttt{/dashboard}.
+    \item Le système récupère le dernier relevé de consommation du capteur (< 1 minute).
+    \item Le système affiche :
+    \begin{itemize}
+        \item Consommation actuelle en litres et en euros (calcul : litres × 0.00722 €/L).
+        \item Consommation aujourd'hui (cumul du jour).
+        \item Comparaison avec l'objectif du mois (pourcentage complété).
+        \item Graphique de la consommation des 24 dernières heures.
+    \end{itemize}
+    \item L'utilisateur peut sélectionner différentes périodes : jour, semaine, mois, année.
+    \item Le système affiche le graphique correspondant avec les données historiques.
+\end{enumerate}
+
+\textbf{Postconditions} :
+\begin{itemize}
+    \item Les données affichées sont à jour (< 1 minute de décalage).
+    \item Les graphiques se chargent en < 2 secondes.
+\end{itemize}
+
+\textbf{Critères d'acceptation} :
+\begin{itemize}
+    \item ✓ Données en temps réel affichées.
+    \item ✓ Graphiques interactifs et responsifs.
+    \item ✓ Plusieurs périodes disponibles.
+    \item ✓ Calcul correct du coût estimé.
+\end{itemize}
+
+\subsubsection{UC-05 : Définir un objectif de consommation}
+
+\textbf{Acteur primaire} : Citoyen
+
+\textbf{Préconditions} :
+\begin{itemize}
+    \item L'utilisateur est authentifié.
+\end{itemize}
+
+\textbf{Flux principal} :
+\begin{enumerate}
+    \item L'utilisateur accède à la section « Objectifs » du dashboard.
+    \item L'utilisateur remplit le formulaire :
+    \begin{itemize}
+        \item Mois cible : sélection du mois (par défaut le mois courant).
+        \item Objectif en litres : saisie d'un nombre positif.
+    \end{itemize}
+    \item Le système valide :
+    \begin{itemize}
+        \item Objectif > 0 et < 10 000 litres.
+        \item Mois n'est pas dans le passé.
+    \end{itemize}
+    \item Le système crée ou met à jour l'enregistrement \texttt{ObjectifConsommation}.
+    \item Le système affiche ``Objectif défini avec succès''.
+\end{enumerate}
+
+\textbf{Flux alternatif} :
+\begin{itemize}
+    \item Si l'objectif est invalide : afficher ``L'objectif doit être entre 1 et 10000 litres''.
+    \item Si une erreur base de données : afficher un message d'erreur générique.
+\end{itemize}
+
+\textbf{Postconditions} :
+\begin{itemize}
+    \item L'objectif est persisté en base de données.
+    \item L'utilisateur peut consulter son progression vers l'objectif.
+\end{itemize}
+
+\subsubsection{UC-06 : Consulter les alertes}
+
+\textbf{Acteur primaire} : Citoyen
+
+\textbf{Préconditions} :
+\begin{itemize}
+    \item L'utilisateur est authentifié.
+\end{itemize}
+
+\textbf{Flux principal} :
+\begin{enumerate}
+    \item L'utilisateur accède à la section « Alertes » du dashboard.
+    \item Le système récupère toutes les alertes de l'utilisateur (lues et non lues).
+    \item Le système affiche :
+    \begin{itemize}
+        \item Nombre d'alertes non lues en badge.
+        \item Liste des alertes triée par date décroissante.
+        \item Pour chaque alerte : type, message, date, niveau d'urgence.
+    \end{itemize}
+    \item L'utilisateur clique sur une alerte pour la marquer comme lue.
+    \item Le système met à jour l'état de l'alerte.
+\end{enumerate}
+
+\textbf{Postconditions} :
+\begin{itemize}
+    \item Les alertes consultées sont marquées comme lues.
+    \item Le badge du nombre d'alertes non lues se met à jour.
+\end{itemize}
+
+\subsection{BF3 - Gestion des capteurs IoT}
+
+\subsubsection{UC-07 : Ajouter un capteur (Administrateur)}
+
+\textbf{Acteur primaire} : Administrateur
+
+\textbf{Préconditions} :
+\begin{itemize}
+    \item L'administrateur est authentifié.
+    \item L'utilisateur à qui associer le capteur existe.
+\end{itemize}
+
+\textbf{Flux principal} :
+\begin{enumerate}
+    \item L'administrateur accède à la section « Gestion des capteurs ».
+    \item L'administrateur remplit le formulaire d'ajout de capteur :
+    \begin{itemize}
+        \item Référence (unique) : ex. \texttt{CAP-2025-001}.
+        \item Type : enum (EAU\_FROIDE, EAU\_CHAUDE, TOTAL).
+        \item Emplacement : ex. « Cuisine – Entrée principale ».
+        \item Utilisateur associé : sélection dans la liste.
+        \item Seuil d'alerte (optionnel) : en litres par minute.
+    \end{itemize}
+    \item Le système valide les données.
+    \item Le système crée l'enregistrement \texttt{CapteurIoT} en base.
+    \item Le capteur est maintenant actif et prêt à recevoir des données.
+    \item Le système affiche ``Capteur créé avec ID: [id]''.
+\end{enumerate}
+
+\textbf{Postconditions} :
+\begin{itemize}
+    \item Le capteur est enregistré et actif.
+    \item Le simulateur IoT ou le capteur réel peut envoyer des données pour ce capteur.
+\end{itemize}
+
+\subsubsection{UC-08 : Recevoir et stocker les données IoT}
+
+\textbf{Acteur primaire} : Capteurs IoT (via Simulateur Python)
+
+\textbf{Préconditions} :
+\begin{itemize}
+    \item Le capteur est enregistré et actif dans le système.
+    \item Le backend est accessible sur \texttt{http://localhost:8080/SmartWaterMonitoring}.
+\end{itemize}
+
+\textbf{Flux principal} :
+\begin{enumerate}
+    \item Le simulateur IoT récupère la liste des capteurs actifs depuis la base de données.
+    \item Pour chaque capteur, le simulateur génère une valeur de consommation (aléatoire avec patterns horaires).
+    \item Le simulateur envoie un POST HTTP à \texttt{/api/waterdata} avec le JSON :
+    \begin{verbatim}
+{
+  "capteurId": 1,
+  "valeurConsommation": 25.5
+}
+    \end{verbatim}
+    \item L'API \texttt{DataApiServlet} reçoit la requête.
+    \item L'API valide :
+    \begin{itemize}
+        \item Format JSON valide.
+        \item Champs obligatoires présents (\texttt{capteurId}, \texttt{valeurConsommation}).
+        \item \texttt{valeurConsommation} > 0 et < 100 litres.
+        \item Le capteur avec cet ID existe.
+    \end{itemize}
+    \item L'API crée un objet \texttt{DonneeCapteur} avec timestamp actuel.
+    \item L'API persiste les données en base.
+    \item L'API retourne HTTP 200 avec réponse JSON :
+    \begin{verbatim}
+{
+  "status": "success",
+  "message": "Donnée reçue et stockée",
+  "dataId": 12345
+}
+    \end{verbatim}
+\end{enumerate}
+
+\textbf{Flux alternatif} :
+\begin{itemize}
+    \item Si le JSON est invalide : retourner HTTP 400 ``JSON invalide''.
+    \item Si le capteur n'existe pas : retourner HTTP 404 ``Capteur introuvable''.
+    \item Si la valeur est invalide : retourner HTTP 400 ``Valeur de consommation invalide''.
+    \item Si une erreur base de données : retourner HTTP 500 ``Erreur serveur''.
+\end{itemize}
+
+\textbf{Postconditions} :
+\begin{itemize}
+    \item La donnée est persistée en base de données.
+    \item La donnée est immédiatement accessible pour l'affichage en temps réel.
+    \item La donnée peut être utilisée pour déclencher des alertes.
+\end{itemize}
+
+\textbf{Critères de performance} :
+\begin{itemize}
+    \item ✓ Latence API < 500 ms.
+    \item ✓ Support de 1000+ capteurs simultanés.
+    \item ✓ Collecte toutes les 60 secondes par capteur.
+\end{itemize}
+
+\subsection{BF4 - Système d'alertes}
+
+\subsubsection{UC-09 : Générer automatiquement des alertes}
+
+\textbf{Acteur primaire} : Système (Service d'alertes)
+
+\textbf{Préconditions} :
+\begin{itemize}
+    \item Une donnée de consommation vient d'être reçue.
+    \item L'utilisateur a au moins un alerteur configuré.
+\end{itemize}
+
+\textbf{Flux principal} :
+\begin{enumerate}
+    \item À la réception d'une donnée, le système appelle \texttt{AlerteService.checkAndGenerateAlerts()}.
+    \item Le système vérifie les seuils :
+    \begin{itemize}
+        \item Si \texttt{valeur > 40 L/min} : créer alerte FUITE (niveau HAUTE).
+        \item Si \texttt{consommation\_jour > 150\% de l'objectif} : créer alerte SURCONSOMMATION (niveau MOYENNE).
+        \item Si \texttt{pas de données depuis 10 min} : créer alerte ANOMALIE (niveau MOYENNE).
+    \end{itemize}
+    \item Pour chaque alerte à créer :
+    \begin{itemize}
+        \item Le système crée un objet \texttt{Alerte}.
+        \item Le système persiste l'alerte en base.
+        \item L'alerte est associée à l'utilisateur propriétaire du capteur.
+    \end{itemize}
+    \item L'alerte devient visible sur le dashboard utilisateur.
+\end{enumerate}
+
+\textbf{Postconditions} :
+\begin{itemize}
+    \item Les alertes sont persistées et auditées.
+    \item L'utilisateur peut consulter les alertes.
+\end{itemize}
+
+\subsection{BF5 - Agrégation quotidienne}
+
+\subsubsection{UC-10 : Agréger les données quotidiennes}
+
+\textbf{Acteur primaire} : Système (Job \texttt{DailyAggregationJob})
+
+\textbf{Préconditions} :
+\begin{itemize}
+    \item Il y a au moins une donnée de consommation pour la journée précédente.
+\end{itemize}
+
+\textbf{Flux principal} :
+\begin{enumerate}
+    \item Chaque jour à 00:30, le job \texttt{DailyAggregationJob} se déclenche automatiquement.
+    \item Pour chaque utilisateur du système :
+    \begin{itemize}
+        \item Le service \texttt{DataAggregationService} récupère toutes les données du jour précédent.
+        \item Il calcule les statistiques :
+        \begin{itemize}
+            \item \textbf{Consommation totale} : somme de toutes les valeurs.
+            \item \textbf{Consommation moyenne} : moyenne arithmétique.
+            \item \textbf{Pic de consommation} : valeur maximale.
+            \item \textbf{Coût estimé} : total × tarif (0.00722 €/L).
+            \item \textbf{Nombre de fuites} : nombre d'alerte FUITE du jour.
+        \end{itemize}
+        \item Il crée un objet \texttt{HistoriqueConsommation} pour le jour.
+        \item Il met à jour les \texttt{Statistique} pour les tendances mensuelles/annuelles.
+    \end{itemize}
+    \item Le job génère un rapport d'exécution avec le nombre d'utilisateurs traités.
+\end{enumerate}
+
+\textbf{Postconditions} :
+\begin{itemize}
+    \item Les historiques sont persistés et queryables.
+    \item Les statistiques sont à jour pour les rapports et graphiques.
+    \item Le job génère un log avec le résultat d'exécution.
+\end{itemize}
+
+\textbf{Critères de performance} :
+\begin{itemize}
+    \item ✓ Agrégation complète en < 5 minutes pour 1000 utilisateurs.
+    \item ✓ Aucun blocage des requêtes en temps réel pendant l'agrégation.
+\end{itemize}
+
+\subsection{BF6 - Supervision administrative}
+
+\subsubsection{UC-11 : Consulter les statistiques globales}
+
+\textbf{Acteur primaire} : Administrateur
+
+\textbf{Préconditions} :
+\begin{itemize}
+    \item L'administrateur est authentifié.
+    \item Au moins une agrégation quotidienne a eu lieu.
+\end{itemize}
+
+\textbf{Flux principal} :
+\begin{enumerate}
+    \item L'administrateur accède au dashboard d'administration \texttt{/index.jsp}.
+    \item Le système récupère les statistiques globales :
+    \begin{itemize}
+        \item Nombre total d'utilisateurs (citoyens et administrateurs).
+        \item Nombre de capteurs actifs/inactifs.
+        \item Consommation totale du jour/mois/année.
+        \item Consommation moyenne par utilisateur.
+        \item Nombre d'alertes générées (par type).
+    \end{itemize}
+    \item Le système affiche des graphiques de tendance avec les données historiques.
+    \item L'administrateur peut filtrer par période ou par utilisateur.
+\end{enumerate}
+
+\textbf{Postconditions} :
+\begin{itemize}
+    \item Les statistiques sont à jour et précises.
+\end{itemize}
+
+\section{Besoins non fonctionnels}
+
+Le tableau \ref{tab:nf_requirements} synthétise les exigences non fonctionnelles du système.
+
+\begin{table}[ht]
+\centering
+\caption{Exigences non fonctionnelles détaillées du système Smart Water Monitoring.}
+\label{tab:nf_requirements}
+\begin{tabular}{|l|p{3.5cm}|p{3.5cm}|}
+\hline
+\textbf{Aspect} & \textbf{Exigence} & \textbf{Justification} \\ \hline
+\textbf{Performance} & API REST < 500 ms & Utilisateurs attendent réactivité \\ \hline
+\textbf{Performance} & Dashboard temps réel < 1 min & Données doivent être fraîches \\ \hline
+\textbf{Performance} & Agrégation < 5 min/1000 users & Ne doit pas impacter utilisateurs \\ \hline
+\textbf{Scalabilité} & 1000+ capteurs simultanés & Croissance future du réseau \\ \hline
+\textbf{Sécurité} & BCrypt 12 rounds & Protection robuste des mots de passe \\ \hline
+\textbf{Sécurité} & RBAC (2 rôles) & Contrôle d'accès granulaire \\ \hline
+\textbf{Sécurité} & Validation entrées & Prévention injection SQL/XSS \\ \hline
+\textbf{Sécurité} & HTTPS recommandé & Chiffrement des données en transit \\ \hline
+\textbf{Disponibilité} & 95\% uptime & Service fiable et accessible \\ \hline
+\textbf{Maintenabilité} & Architecture modulaire & Évolution facile et corrections \\ \hline
+\textbf{Maintenabilité} & Code documenté & Facilite maintenance future \\ \hline
+\textbf{Compatibilité} & Chrome, Firefox, Edge & Support navigateurs modernes \\ \hline
+\textbf{Usabilité} & Interface intuitive & Accessibilité pour tous \\ \hline
+\textbf{Usabilité} & Responsive design & Support mobile et tablettes \\ \hline
+\end{tabular}
+\end{table}
+
+\section{Diagramme UML des cas d'utilisation}
+
+La figure \ref{fig:use_cases_diagram} présente le diagramme UML des cas d'utilisation détaillés du système Smart Water Monitoring.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.95\linewidth]{figures/use_cases.png}
+    \caption{Diagramme UML des cas d'utilisation montrant les interactions entre les acteurs (Citoyen, Administrateur, Capteur IoT, Job) et les 11 cas d'utilisation du système.}
+    \label{fig:use_cases_diagram}
+\end{figure}
+
+\section{Matrice de traçabilité besoins-tests}
+
+Le tableau \ref{tab:traceability} établit la traçabilité entre les besoins fonctionnels et les tests de validation.
+
+\begin{table}[ht]
+\centering
+\caption{Matrice de traçabilité des besoins vers les tests de validation.}
+\label{tab:traceability}
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Besoin fonctionnel} & \textbf{Cas d'utilisation} & \textbf{Test(s) associé(s)} \\ \hline
+Inscription & UC-01 & Test\_Signup\_Validation \\ \hline
+Authentification & UC-02 & Test\_Login\_Success, Test\_Login\_Failure \\ \hline
+Déconnexion & UC-03 & Test\_Logout\_SessionDestroyed \\ \hline
+Visualisation temps réel & UC-04 & Test\_Dashboard\_RealTime\_Data \\ \hline
+Définir objectif & UC-05 & Test\_ObjectiveManagement\_CRUD \\ \hline
+Consulter alertes & UC-06 & Test\_AlerteConsultation \\ \hline
+Ajouter capteur & UC-07 & Test\_SensorManagement\_CRUD \\ \hline
+Collecter données IoT & UC-08 & Test\_API\_Waterdata\_POST, Performance \\ \hline
+Générer alertes & UC-09 & Test\_AlertGeneration\_Triggers \\ \hline
+Agréger quotidiennement & UC-10 & Test\_DailyAggregation\_Job \\ \hline
+Statistiques admin & UC-11 & Test\_AdminStatistics\_Accuracy \\ \hline
+\end{tabular}
+\end{table}
+
+\section{Conclusion}
+
+Ce chapitre a approfondis l'analyse des besoins du système \textbf{Smart Water Monitoring System}. Nous avons spécifié :
+
+\begin{itemize}
+    \item \textbf{4 acteurs principaux} : Citoyen, Administrateur, Capteurs IoT, Job planifié.
+    \item \textbf{11 cas d'utilisation détaillés} avec flux, alternatives, préconditions et postconditions.
+    \item \textbf{6 catégories de besoins fonctionnels} couvrant l'intégralité du système.
+    \item \textbf{14 exigences non fonctionnelles} garantissant qualité et robustesse.
+    \item \textbf{Matrice de traçabilité} facilitant la validation ultérieure.
+\end{itemize}
+
+Cette analyse détaillée constitue le socle de la phase de conception qui sera abordée dans le chapitre suivant. Chaque besoin pourra être mappé à des composants de l'architecture et à des tests unitaires/d'intégration pour assurer la qualité de la réalisation.

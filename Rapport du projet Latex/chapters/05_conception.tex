@@ -1,14 +1,270 @@
 \chapter{Analyse et conception}
 \label{ch:analysis_design}
 
-% =============================
-% INTRODUCTION
-% =============================
 \section{Introduction}
-Cette section présente l’objectif du chapitre, qui consiste à traduire les besoins fonctionnels 
-et non fonctionnels du projet en une solution technique détaillée. Elle explique comment les choix 
-de modélisation, d’architecture et de conception ont été déterminés et justifiés, et comment ils 
-s’inscrivent dans la logique globale du projet. 
+
+Ce chapitre traduit les besoins fonctionnels et non fonctionnels identifiés aux chapitres précédents en une architecture technique détaillée. Il présente les choix de conception du système \textbf{Smart Water Monitoring System}, justifiés par rapport aux exigences et contraintes du projet. Nous détaillons l'approche architecturale, les diagrammes UML de modélisation, la structure des données, et les patterns de conception retenus.
+
+\section{Approche architecturale}
+
+\subsection{Choix d'une architecture monolithique en couches}
+
+Le système Smart Water Monitoring adopte une \textbf{architecture monolithique en trois couches} basée sur le patron Modèle-Vue-Contrôleur (MVC), implémenté avec Jakarta EE (anciennement Java EE).
+
+
+
+\begin{table}[ht]
+\centering
+\caption{Comparaison : Architecture monolithique vs microservices pour Smart Water Monitoring.}
+\label{tab:arch_comparison}
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Critère} & \textbf{Monolithique} & \textbf{Microservices} \\ \hline
+Complexité déploiement & ✓ Basse (WAR unique) & Haute (multiples services) \\ \hline
+Temps développement & ✓ Court (cadre unifié) & Long (coordination) \\ \hline
+Performance locale & ✓ Optimale (pas RPC) & Dégradée (réseau) \\ \hline
+Scalabilité modulaire & Limitée & ✓ Excellente \\ \hline
+Volume données & ✓ Bon (peu de calls) & Problématique \\ \hline
+\end{tabular}
+\end{table}
+
+Pour un projet académique de module JEE avec des contraintes de temps et volume de données limité, la monolithique s'avère plus appropriée. Elle permet de :
+\begin{itemize}
+    \item Développer rapidement avec un framework unifié (Jakarta EE).
+    \item Éviter la complexité des appels réseau inter-services.
+    \item Faciliter le déploiement sur un serveur unique (TomEE, WildFly, etc.).
+    \item Optimiser l'accès à la base de données.
+\end{itemize}
+
+\subsection{Organisation en trois couches}
+
+Le système est divisé en trois couches distinctes :
+
+\subsubsection{Couche de présentation}
+
+\textbf{Responsabilités} :
+\begin{itemize}
+    \item Gérer l'interface utilisateur web (formulaires, tableaux de bord, graphiques).
+    \item Traiter les requêtes HTTP (GET, POST).
+    \item Afficher les données et messages de rétroaction utilisateur.
+\end{itemize}
+
+\textbf{Composants} :
+\begin{itemize}
+    \item \textbf{Pages JSP} : \texttt{login.jsp}, \texttt{signup.jsp}, \texttt{dashboard}, etc.
+    \item \textbf{Servlets} : Contrôleurs HTTP traitant les requêtes utilisateur.
+    \item \textbf{Assets statiques} : CSS, JavaScript, images.
+\end{itemize}
+
+\subsubsection{Couche métier}
+
+\textbf{Responsabilités} :
+\begin{itemize}
+    \item Implémenter la logique fonctionnelle du système.
+    \item Gérer les règles de validation et les calculs.
+    \item Orchestrer les opérations entre les DAOs et les services.
+\end{itemize}
+
+\textbf{Composants} :
+\begin{itemize}
+    \item \textbf{Services} : Logique métier (ex. \texttt{UtilisateurService}, \texttt{AlerteService}, \texttt{DataAggregationService}).
+    \item \textbf{Modèles métier} : Classes représentant les concepts clés.
+    \item \textbf{Utilitaires} : Classes d'assistance (ex. \texttt{SecurityUtil} pour BCrypt).
+    \item \textbf{Jobs/Schedulers} : Tâches planifiées (ex. \texttt{DailyAggregationJob}).
+\end{itemize}
+
+\subsubsection{Couche de données}
+
+\textbf{Responsabilités} :
+\begin{itemize}
+    \item Assurer la persistance et la récupération des données.
+    \item Abstraire les détails d'implémentation de la base de données.
+    \item Fournir une interface uniforme d'accès aux données.
+\end{itemize}
+
+\textbf{Composants} :
+\begin{itemize}
+    \item \textbf{DAOs (Data Access Objects)} : Accès aux données par entité.
+    \item \textbf{ORM Hibernate} : Mapping objet-relationnel.
+    \item \textbf{Base de données MySQL 8} : Persistance des données.
+\end{itemize}
+
+\subsection{Schéma de l'architecture}
+
+La figure \ref{fig:architecture_layers} illustre l'organisation en couches et les flux de données.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.95\linewidth]{figures/architecture_layers.png}
+    \caption{Architecture en trois couches du système Smart Water Monitoring : présentation (JSP/Servlets), métier (Services), et données (DAOs/Hibernate).}
+    \label{fig:architecture_layers}
+\end{figure}
+
+\section{Modèle de données}
+
+\subsection{Entités principales}
+
+Le système manipule 8 entités principales (+ 2 types énumérés) :
+
+\begin{table}[ht]
+\centering
+\caption{Entités principales du système Smart Water Monitoring.}
+\label{tab:entities}
+\begin{tabular}{|l|l|l|p{2.5cm}|}
+\hline
+\textbf{Entité} & \textbf{Clé primaire} & \textbf{Attributs clés} & \textbf{Relations} \\ \hline
+Utilisateur & idUtilisateur & email, nom, motDePasse, type & 1→N Capteur, Alerte \\ \hline
+CapteurIoT & idCapteur & reference, type, etat & M→1 Utilisateur \\ \hline
+DonneeCapteur & idDonnee & valeur, timestamp & M→1 Capteur \\ \hline
+Alerte & idAlerte & type, message, estLue & M→1 Utilisateur \\ \hline
+ObjectifConsommation & idObjectif & valeurObjectif, mois & M→1 Utilisateur \\ \hline
+HistoriqueConsommation & idHistorique & consommationTotal, date & M→1 Utilisateur \\ \hline
+Statistique & idStatistique & consommationMoyenne & M→1 Utilisateur \\ \hline
+TypeAlerte & idType & nomType, description & 1→N Alerte \\ \hline
+\end{tabular}
+\end{table}
+
+\subsection{Diagramme de classes}
+
+La figure \ref{fig:class_diagram} présente le diagramme UML des classes du domaine.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.95\linewidth]{figures/WMS_class_diagram}
+    \caption{Diagramme UML des classes du système montrant les entités, leurs attributs, et les relations de multiplicité.}
+    \label{fig:class_diagram}
+\end{figure}
+
+\subsection{Schéma de la base de données}
+
+Le tableau \ref{tab:db_schema} détaille la structure des tables principales :
+
+\begin{table}[ht]
+\centering
+\caption{Structure de la base de données MySQL 8 - Tables principales.}
+\label{tab:db_schema}
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Table} & \textbf{Colonne} & \textbf{Type / Contrainte} \\ \hline
+\multirow{6}{*}{\textbf{utilisateurs}} & idUtilisateur & INT PRIMARY KEY AUTO\_INCREMENT \\ \cline{2-3}
+& email & VARCHAR(100) UNIQUE NOT NULL \\ \cline{2-3}
+& motDePasse & VARCHAR(255) NOT NULL (BCrypt) \\ \cline{2-3}
+& type & ENUM('CITOYEN', 'ADMINISTRATEUR') \\ \cline{2-3}
+& dateInscription & TIMESTAMP DEFAULT CURRENT\_TIMESTAMP \\ \hline
+\multirow{5}{*}{\textbf{capteurs}} & idCapteur & INT PRIMARY KEY AUTO\_INCREMENT \\ \cline{2-3}
+& reference & VARCHAR(100) UNIQUE NOT NULL \\ \cline{2-3}
+& type & ENUM('EAU\_FROIDE', 'EAU\_CHAUDE', 'TOTAL') \\ \cline{2-3}
+& utilisateur\_id & INT FOREIGN KEY → utilisateurs \\ \cline{2-3}
+& etat & BOOLEAN DEFAULT TRUE \\ \hline
+\multirow{4}{*}{\textbf{donnees\_capteurs}} & idDonnee & INT PRIMARY KEY AUTO\_INCREMENT \\ \cline{2-3}
+& capteur\_id & INT FOREIGN KEY → capteurs \\ \cline{2-3}
+& valeur & DECIMAL(8,2) NOT NULL \\ \cline{2-3}
+& timestamp & TIMESTAMP DEFAULT CURRENT\_TIMESTAMP \\ \hline
+\multirow{3}{*}{\textbf{alertes}} & idAlerte & INT PRIMARY KEY AUTO\_INCREMENT \\ \cline{2-3}
+& utilisateur\_id & INT FOREIGN KEY → utilisateurs \\ \cline{2-3}
+& type & ENUM('FUITE', 'SURCONSOMMATION', 'ANOMALIE') \\ \hline
+\end{tabular}
+\end{table}
+
+\section{Diagrammes de séquence}
+
+\subsection{Séquence d'authentification}
+
+La figure \ref{fig:sequence_auth} illustre le flux d'authentification.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.9\linewidth]{figures/sequence_auth.png}
+    \caption{Diagramme de séquence : Authentification utilisateur avec vérification BCrypt.}
+    \label{fig:sequence_auth}
+\end{figure}
+
+\subsection{Séquence de collecte IoT}
+
+La figure \ref{fig:sequence_iot} illustre le flux de collecte de données.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.9\linewidth]{figures/sequence_iot.png}
+    \caption{Diagramme de séquence : Collecte des données IoT via API REST.}
+    \label{fig:sequence_iot}
+\end{figure}
+
+\subsection{Séquence d'agrégation quotidienne}
+
+La figure \ref{fig:sequence_aggregation} illustre le processus d'agrégation des données quotidiennes.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.9\linewidth]{figures/sequence_aggregation.png}
+    \caption{Diagramme de séquence : Job d'agrégation quotidienne des données de consommation.}
+    \label{fig:sequence_aggregation}
+\end{figure}
+
+\subsection{Workflow général du système}
+
+La figure \ref{fig:wms_sequence} illustre le workflow complet depuis l'authentification jusqu'à la notification des alertes.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.95\linewidth]{figures/WMS_sequence_diagram.png}
+    \caption{Diagramme de séquence : Workflow général du système incluant authentification, consulta des données, vérification des objectifs, et génération d'alertes.}
+    \label{fig:wms_sequence}
+\end{figure}
+
+\section{Patterns de conception}
+
+Le système utilise plusieurs patterns reconnus :
+
+\subsection{Pattern DAO}
+Abstrait l'accès aux données via \texttt{AbstractDao<T>} et DAOs spécialisés.
+
+\subsection{Pattern Service}
+Encapsule la logique métier via \texttt{IService<T>} et services implémentants.
+
+\subsection{Pattern Singleton}
+Garantit une instance unique pour \texttt{DailyAggregationJob} et \texttt{HibernateUtil}.
+
+\subsection{Pattern MVC}
+Sépare Model (JPA), View (JSP), et Controller (Servlets).
+
+\subsection{Pattern Filtre}
+\texttt{AuthenticationFilter} intercepte et contrôle les requêtes HTTP.
+
+\section{Sécurité}
+
+\subsection{Hachage des mots de passe}
+Utilise BCrypt avec 12 rounds de salage.
+
+\subsection{Gestion de session}
+Sessions HTTP côté serveur avec timeout configurable (30 minutes).
+
+\subsection{Contrôle d'accès (RBAC)}
+Deux rôles (CITOYEN, ADMINISTRATEUR) avec filtres d'accès.
+
+\section{Pile technologique}
+
+Le tableau \ref{tab:tech_stack} résume les technologies utilisées.
+
+\begin{table}[ht]
+\centering
+\caption{Pile technologique du système Smart Water Monitoring.}
+\label{tab:tech_stack}
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Couche} & \textbf{Technologie} & \textbf{Version} \\ \hline
+Présentation & Jakarta Servlet / JSP & 5.0.0 / 2.0.0 \\ \hline
+Métier & Jakarta EE & 9.1 \\ \hline
+ORM & Hibernate & 6.4.4 \\ \hline
+SGBD & MySQL & 8.0 \\ \hline
+Sécurité & jBCrypt & 0.4 \\ \hline
+Build & Maven & 3.x \\ \hline
+\end{tabular}
+\end{table}
+
+\section{Conclusion}
+
+Ce chapitre a détaillé la conception du système Smart Water Monitoring avec architecture monolithique en trois couches, modèle de données robuste, patterns SOLID, et sécurité renforcée. Ces choix assurent une base solide pour l'implémentation qui suit.
 
 % =============================
 % FORMALISME DE MODÉLISATION

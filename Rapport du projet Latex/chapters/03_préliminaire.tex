@@ -1,66 +1,292 @@
 \chapter{Étude préliminaire et fonctionnelle}
 
 \section{Introduction}
-Ce chapitre a pour objectif de \textbf{cadrer les besoins} auxquels le projet doit répondre, 
-qu’ils soient liés aux fonctionnalités principales, aux contraintes techniques ou encore 
-à l’expérience utilisateur. Il permet également de clarifier \textbf{l’identité} des différents 
-acteurs, ainsi que leur rôle dans le système. Enfin, il détaille la logique de fonctionnement 
-au travers de cas d’utilisation et de processus métier éventuels.
+Ce chapitre détaille les besoins fonctionnels et non fonctionnels du système \textbf{Smart Water Monitoring System}. Il identifie les différents acteurs du système, leur rôle respectif, et décrit les fonctionnalités clés à travers des cas d'utilisation détaillés. Cette étude préliminaire établit le cadre fonctionnel sur lequel reposera la conception et l'implémentation du système. Elle constitue également le point de départ pour la validation des fonctionnalités développées.
 
 \section{Étude des besoins}
-Dans cette section, on distingue généralement deux grandes catégories de besoins : 
-\textbf{fonctionnels} (qui décrivent ce que le système doit faire) et 
-\textbf{non fonctionnels} (liés aux performances, à la fiabilité, à la sécurité, etc.).
 
 \subsection{Besoins fonctionnels}
+
+Le système Smart Water Monitoring doit satisfaire l'ensemble des besoins fonctionnels suivants :
+
 \begin{itemize}
-    \item \textbf{Lister les fonctionnalités principales :}  
-    Il s’agit de décrire toutes les actions ou services que l’application devra proposer 
-    (ex. création de comptes, calcul d’un paramètre spécifique, édition de rapports, etc.).
-    \item \textbf{Illustrer par des scénarios d’utilisation concrets :}  
-    Décrire, par exemple, les étapes qu’un utilisateur va suivre pour atteindre un objectif 
-    (inscription, consultation, validation, etc.). Cela aide à mieux cerner la séquence 
-    d’actions nécessaires et l’interface ou les interfaces prévues.
+    \item \textbf{Gestion des comptes utilisateurs} : Permettre l'inscription et l'authentification des citoyens et des administrateurs avec validation sécurisée des données et hachage des mots de passe via BCrypt.
+    
+    \item \textbf{Collecte de données IoT en temps réel} : Recevoir et stocker les données de consommation d'eau envoyées par les capteurs IoT simulés ou réels via des API REST. Les données doivent être reçues et validées en moins de 500 ms.
+    
+    \item \textbf{Visualisation de la consommation} : Afficher en temps réel et en historique la consommation d'eau de chaque utilisateur à travers des graphiques interactifs et des tableaux de bord.
+    
+    \item \textbf{Gestion des objectifs de consommation} : Permettre aux utilisateurs de définir des objectifs mensuels de consommation personnalisés et de suivre leur progression quotidiennement.
+    
+    \item \textbf{Système d'alertes intelligent} : Générer automatiquement des alertes en cas de détection de fuites (consommation > 40L/min), de surconsommation (> 150\% de l'objectif) ou d'anomalies détectées par le système.
+    
+    \item \textbf{Agrégation quotidienne automatique des données} : Calculer automatiquement chaque jour à minuit les statistiques de consommation (somme quotidienne, moyenne, pics, coût) pour chaque utilisateur.
+    
+    \item \textbf{Gestion des capteurs IoT} : Permettre aux administrateurs d'ajouter, modifier, consulter ou supprimer des capteurs et d'en suivre l'état (actif/inactif).
+    
+    \item \textbf{Statistiques et rapports administrateurs} : Fournir des statistiques agrégées et des rapports analytiques pour l'analyse de la consommation globale, la détection de tendances et le diagnostic du réseau.
+    
+    \item \textbf{Gestion des types d'alertes} : Permettre aux administrateurs de configurer les types d'alertes disponibles (FUITE, SURCONSOMMATION, ANOMALIE) et leurs messages.
 \end{itemize}
 
 \subsection{Besoins non fonctionnels}
-\begin{itemize}
-    \item \textbf{Contraintes de performance, de sécurité et de fiabilité :}  
-    Par exemple, temps de réponse maximal acceptable, taux de disponibilité, 
-    modes d’authentification ou de chiffrement des données, etc.
-    \item \textbf{Implications sur le choix de l’architecture ou de la technologie :}  
-    Mentionner les répercussions sur les choix de framework (Spring Boot, Django, etc.), 
-    de base de données (SQL ou NoSQL), ou encore sur le design (microservices, monolithique).
-\end{itemize}
+
+Le tableau \ref{tab:besoins_non_fonctionnels} synthétise les exigences non fonctionnelles du système.
+
+\begin{table}[ht]
+\centering
+\caption{Exigences non fonctionnelles du système Smart Water Monitoring.}
+\label{tab:besoins_non_fonctionnels}
+\begin{tabular}{|l|p{4.5cm}|p{3.5cm}|}
+\hline
+\textbf{Catégorie} & \textbf{Exigence} & \textbf{Critère accepté} \\ \hline
+\textbf{Performance} & Temps de réponse API REST & < 500 ms \\ \hline
+\textbf{Performance} & Agrégation quotidienne & < 5 minutes pour 1000 utilisateurs \\ \hline
+\textbf{Performance} & Capacité de capteurs simultanés & 1000+ capteurs actifs \\ \hline
+\textbf{Sécurité} & Hachage des mots de passe & BCrypt avec 12 rounds \\ \hline
+\textbf{Sécurité} & Authentification & Session-based HTTP robuste \\ \hline
+\textbf{Sécurité} & Contrôle d'accès & Role-Based (CITOYEN, ADMINISTRATEUR) \\ \hline
+\textbf{Sécurité} & Protection de données & Validation des données en entrée \\ \hline
+\textbf{Disponibilité} & Uptime cible & 95\% minimum en production \\ \hline
+\textbf{Scalabilité} & Architecture & Monolithique JEE extensible \\ \hline
+\textbf{Maintenabilité} & Code source & Modulaire, bien documenté, testable \\ \hline
+\textbf{Compatibilité} & Navigateurs Web & Chrome, Firefox, Edge (versions récentes) \\ \hline
+\textbf{Persistance} & Base de données & MySQL 8.0 avec Hibernate ORM \\ \hline
+\end{tabular}
+\end{table}
 
 \section{Identification des acteurs}
-L’identification des acteurs consiste à \textbf{définir les différents profils} qui interagiront 
-avec le système, ainsi que leurs droits et responsabilités.
 
+Le système Smart Water Monitoring intègre deux profils principaux d'utilisateurs, chacun avec ses responsabilités et droits spécifiques.
+
+\subsection{Profil 1 : Citoyen}
+
+\textbf{Description générale} : Un citoyen est un utilisateur final qui souhaite suivre sa consommation d'eau personnelle en temps réel et optimiser son usage de l'eau à travers un tableau de bord intuitif.
+
+\textbf{Responsabilités et droits} :
 \begin{itemize}
-    \item \textbf{Description des profils :}  
-    Par exemple, un administrateur, un utilisateur classique, un superviseur, un étudiant, 
-    un enseignant, etc.
-    \item \textbf{Fonctionnalités associées :}  
-    Chaque acteur se voit attribuer des permissions spécifiques (créer un compte, valider 
-    une saisie, accéder à certaines données sensibles, etc.). Lister en détail ces habilitations 
-    permet d’anticiper la gestion des rôles et des autorisations.
+    \item Créer un compte personnel sécurisé et gérer son profil utilisateur.
+    \item Consulter en temps réel sa consommation d'eau actuelle et son historique détaillé.
+    \item Visualiser des graphiques de consommation (quotidiens, mensuels, annuels) avec des tendances.
+    \item Définir des objectifs de consommation mensuels personnalisés et suivre sa progression.
+    \item Recevoir des alertes en cas de détection de fuite ou de surconsommation.
+    \item Consulter les statistiques personnelles (consommation moyenne, pics, coûts estimés).
+    \item Gérer ses capteurs IoT personnels (consulter leur état, performance et historique).
 \end{itemize}
 
-\section{Cas d’utilisation et diagrammes}
-Les \textbf{use cases} (cas d’utilisation) sont très utiles pour formaliser comment chaque acteur 
-utilise le système. Ils peuvent être représentés sous forme de diagramme UML, accompagné 
-d’une description textuelle plus précise.
-
+\textbf{Restrictions et droits d'accès} :
 \begin{itemize}
-    \item \textbf{Présentation des use cases :}  
-    Un diagramme UML permet de visualiser rapidement quelles actions sont possibles pour 
-    chaque acteur. Chaque use case peut ensuite être décrit textuellement (préconditions, 
-    flux principal, flux alternatif, postconditions).
-    \item \textbf{Couverture des besoins fonctionnels :}  
-    Vérifier que l’ensemble des fonctionnalités clés identifiées dans la section précédente 
-    se retrouve bien dans les cas d’utilisation. Cela contribue à la cohérence du projet.
+    \item Ne peut accéder qu'à ses propres données de consommation.
+    \item Ne peut pas modifier les données des autres utilisateurs ou des administrateurs.
+    \item N'a pas accès aux fonctions d'administration du système.
+    \item Ne peut pas modifier les seuils d'alertes globaux du système.
 \end{itemize}
+
+\subsection{Profil 2 : Administrateur}
+
+\textbf{Description générale} : Un administrateur est un gestionnaire du réseau d'eau responsable de la supervision globale du système, de la maintenance et de l'optimisation des ressources hydriques.
+
+\textbf{Responsabilités et droits} :
+\begin{itemize}
+    \item Gérer les comptes utilisateurs (création, suppression, modification, activation/blocage).
+    \item Ajouter, configurer et supprimer les capteurs IoT dans le système.
+    \item Consulter les statistiques agrégées de consommation de tous les utilisateurs ou groupes.
+    \item Analyser les tendances globales de consommation et identifier les anomalies.
+    \item Gérer les types d'alertes disponibles et configurer les seuils de déclenchement.
+    \item Générer des rapports de diagnostic du système et de consommation.
+    \item Monitorer la santé du système (capteurs actifs, taux d'erreur API, temps de réponse).
+    \item Accéder aux logs d'audit et aux historiques des actions utilisateur.
+\end{itemize}
+
+\textbf{Restrictions et droits d'accès} :
+\begin{itemize}
+    \item Respecte la confidentialité des données sensibles selon la réglementation.
+    \item Ne peut pas modifier directement les données brutes de consommation (intégrité des données).
+    \item Les actions critiques sont loggées et auditées pour la traçabilité.
+\end{itemize}
+
+\section{Cas d'utilisation}
+
+Les cas d'utilisation suivants formalisent l'interaction des acteurs avec le système.
+
+\subsection{UC1 : Authentification utilisateur}
+
+\textbf{Acteurs} : Citoyen, Administrateur
+
+\textbf{Précondition} : L'utilisateur dispose d'un compte valide dans le système.
+
+\textbf{Flux principal} :
+\begin{enumerate}
+    \item L'utilisateur accède à la page de connexion.
+    \item L'utilisateur entre son email et son mot de passe.
+    \item Le système vérifie l'existence du compte et valide le mot de passe avec BCrypt.
+    \item Le système crée une session utilisateur sécurisée.
+    \item Le système redirige vers le tableau de bord approprié (citoyen ou admin).
+\end{enumerate}
+
+\textbf{Flux alternatif} :
+\begin{itemize}
+    \item Si l'email n'existe pas : afficher ``Email introuvable''.
+    \item Si le mot de passe est incorrect : afficher ``Mot de passe incorrect''.
+    \item Si le compte est désactivé : afficher ``Compte suspendu, contactez l'administrateur''.
+\end{itemize}
+
+\textbf{Postcondition} : L'utilisateur est authentifié et peut accéder aux ressources de son profil.
+
+\subsection{UC2 : Consulter la consommation en temps réel}
+
+\textbf{Acteurs} : Citoyen
+
+\textbf{Précondition} : L'utilisateur est authentifié et dispose d'au moins un capteur actif.
+
+\textbf{Flux principal} :
+\begin{enumerate}
+    \item L'utilisateur accède au tableau de bord.
+    \item Le système récupère le dernier relevé de consommation du capteur (< 1 minute).
+    \item Le système affiche la consommation actuelle en litres et en euros.
+    \item Le système affiche un graphique de la consommation des 24 dernières heures.
+    \item L'utilisateur peut naviguer pour consulter d'autres périodes (semaine, mois, année).
+\end{enumerate}
+
+\textbf{Postcondition} : Les données affichées correspondent aux dernières données reçues des capteurs.
+
+\subsection{UC3 : Gérer les capteurs IoT}
+
+\textbf{Acteurs} : Administrateur (création), Citoyen (consultation)
+
+\textbf{Flux pour l'ajout de capteur (Admin)} :
+\begin{enumerate}
+    \item L'administrateur accède à la section ``Gestion des capteurs''.
+    \item L'administrateur remplit le formulaire (référence, type, localisation, utilisateur associé).
+    \item Le système valide les données et crée le capteur en base de données.
+    \item Le système affiche ``Capteur créé avec succès'' et retourne l'ID du capteur.
+    \item Le capteur devient immédiatement opérationnel pour recevoir des données.
+\end{enumerate}
+
+\textbf{Flux pour la consultation (Citoyen)} :
+\begin{enumerate}
+    \item Le citoyen accède à la section ``Mes capteurs''.
+    \item Le système affiche la liste de ses capteurs avec leur état (Actif/Inactif).
+    \item Le citoyen peut consulter l'historique et les statistiques de chaque capteur.
+\end{enumerate}
+
+\subsection{UC4 : Collecter les données IoT}
+
+\textbf{Acteurs} : Système de capteurs IoT (Simulateur Python)
+
+\textbf{Précondition} : Le capteur est enregistré et actif dans le système.
+
+\textbf{Flux principal} :
+\begin{enumerate}
+    \item Le simulateur IoT génère une donnée de consommation pour chaque capteur (toutes les 60 secondes).
+    \item Le simulateur envoie la donnée au backend via l'API REST : \texttt{POST /api/waterdata}.
+    \item L'API reçoit et valide la donnée (format JSON, plages acceptables).
+    \item L'API stocke la donnée en base de données avec un timestamp précis.
+    \item L'API retourne une réponse HTTP 200 JSON avec le statut ``success''.
+    \item Les données sont immédiatement disponibles pour l'affichage en temps réel.
+\end{enumerate}
+
+\textbf{Format JSON reçu} :
+\begin{verbatim}
+{
+  "capteurId": 1,
+  "valeurConsommation": 25.5
+}
+\end{verbatim}
+
+\textbf{Postcondition} : La donnée est persistée, auditée et accessible pour l'agrégation.
+
+\subsection{UC5 : Générer des alertes automatiques}
+
+\textbf{Acteurs} : Système d'alertes
+
+\textbf{Flux principal} :
+\begin{enumerate}
+    \item À la réception d'une donnée de consommation, le système vérifie les seuils d'alerte.
+    \item Si la valeur dépasse le seuil de fuite (> 40 L/min) : créer alerte ``FUITE''.
+    \item Si la consommation cumulative du jour dépasse 150\% de l'objectif : créer alerte ``SURCONSOMMATION''.
+    \item L'alerte est stockée en base et associée à l'utilisateur concerné.
+    \item L'utilisateur voit l'alerte non lue en haut de son tableau de bord.
+    \item L'alerte peut être marquée comme lue après consultation.
+\end{enumerate}
+
+\textbf{Seuils d'alerte configurés} :
+\begin{table}[ht]
+\centering
+\caption{Seuils d'alerte du système Smart Water Monitoring.}
+\label{tab:seuils_alerte}
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Type d'alerte} & \textbf{Condition de déclenchement} & \textbf{Niveau d'urgence} \\ \hline
+FUITE & Consommation instantanée > 40 L/min & HAUTE \\ \hline
+SURCONSOMMATION & Consommation quotidienne > 150\% de l'objectif & MOYENNE \\ \hline
+ANOMALIE & Absence de données pendant 10 minutes & MOYENNE \\ \hline
+\end{tabular}
+\end{table}
+
+\subsection{UC6 : Agrégation quotidienne des données}
+
+\textbf{Acteurs} : Système (Job planifié ``DailyAggregationJob'')
+
+\textbf{Flux principal} :
+\begin{enumerate}
+    \item Chaque jour à 00:30 (configuré), le job planifié se déclenche automatiquement.
+    \item Pour chaque utilisateur, le système récupère toutes les données du jour précédent.
+    \item Le système calcule :
+    \begin{itemize}
+        \item Consommation totale (somme de toutes les valeurs en litres).
+        \item Consommation moyenne (moyenne des valeurs).
+        \item Pic de consommation (valeur maximale).
+        \item Coût estimé (total × 0.00722 €/L).
+        \item Nombre de fuites détectées.
+    \end{itemize}
+    \item Le système crée un enregistrement \texttt{HistoriqueConsommation} pour le jour.
+    \item Le système met à jour les \texttt{Statistiques} (tendances, moyennes mensuelles).
+    \item Le système génère des alertes si les seuils sont atteints.
+    \item Le job génère un rapport d'exécution avec le nombre d'utilisateurs traités.
+\end{enumerate}
+
+\textbf{Postcondition} : Les données sont agrégées et les statistiques sont à jour pour consultation.
+
+\section{Flux de données principaux}
+
+Le tableau \ref{tab:flux_donnees} décrit les flux de données clés du système.
+
+\begin{table}[ht]
+\centering
+\caption{Flux de données principaux du système Smart Water Monitoring.}
+\label{tab:flux_donnees}
+\begin{tabular}{|l|l|l|l|}
+\hline
+\textbf{Flux} & \textbf{Source} & \textbf{Destination} & \textbf{Fréquence} \\ \hline
+Données brutes & Capteur/Simulateur & API \texttt{/api/waterdata} & 60 secondes \\ \hline
+Données en temps réel & Base de données & Dashboard citoyen & 30-60 secondes \\ \hline
+Alertes générées & Système & Utilisateur (session) & Événementiel \\ \hline
+Agrégation quotidienne & Données brutes & \texttt{HistoriqueConsommation} & Quotidien (00:30) \\ \hline
+Rapports administrateur & \texttt{Statistique} & Dashboard admin & On-demand \\ \hline
+\end{tabular}
+\end{table}
+
+\section{Diagramme des cas d'utilisation}
+
+La figure \ref{fig:use_cases} présente le diagramme UML des cas d'utilisation du système.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.9\linewidth]{figures/use_cases}
+    \caption{Diagramme UML des cas d'utilisation : Smart Water Monitoring System montrant les interactions entre les acteurs Citoyen, Administrateur et le système.}
+    \label{fig:use_cases}
+\end{figure}
+
+\section{Conclusion}
+
+Ce chapitre a établi les fondations fonctionnelles du système \textbf{Smart Water Monitoring System}. Les besoins identifiés couvrent l'intégralité du cycle de vie des données de consommation d'eau, du captage en temps réel à l'analyse statistique quotidienne et à la détection d'anomalies.
+
+Les deux profils d'utilisateurs (Citoyen et Administrateur) permettent une distribution claire des responsabilités et un contrôle d'accès granulaire basé sur les rôles. Les cas d'utilisation détaillés démontrent comment le système satisfait chacun des besoins énoncés et établissent les interactions clés entre les acteurs et le système.
+
+
+
+Les contraintes technologiques et de sécurité (Jakarta EE, Hibernate, MySQL, BCrypt, RBAC) définissent le périmètre de l'implémentation. Le chapitre suivant approfondira l'analyse de l'architecture technique, présentera l'état de l'art des solutions similaires et détaillera les choix de conception du système.
 
 \section{Processus métier (si nécessaire)}
 Dans certains projets, il peut être pertinent de détailler le \textbf{workflow global} (suite 

@@ -1,9 +1,16 @@
 \babel@toc {french}{}\relax 
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {1.1}{\ignorespaces Planification des sprints.}}{4}{table.caption.11}%
+\contentsline {table}{\numberline {1.1}{\ignorespaces Comparaison entre la gestion traditionnelle et la solution proposée.}}{5}{table.caption.16}%
+\contentsline {table}{\numberline {1.2}{\ignorespaces Planification des sprints du projet Smart Water Monitoring.}}{7}{table.caption.18}%
 \addvspace {10\p@ }
+\contentsline {table}{\numberline {2.1}{\ignorespaces Exigences non fonctionnelles du système Smart Water Monitoring.}}{9}{table.caption.19}%
+\contentsline {table}{\numberline {2.2}{\ignorespaces Seuils d'alerte du système Smart Water Monitoring.}}{12}{table.caption.20}%
+\contentsline {table}{\numberline {2.3}{\ignorespaces Flux de données principaux du système Smart Water Monitoring.}}{13}{table.caption.21}%
 \addvspace {10\p@ }
-\addvspace {10\p@ }
+\contentsline {table}{\numberline {3.1}{\ignorespaces Comparaison : Architecture monolithique vs microservices pour Smart Water Monitoring.}}{15}{table.caption.24}%
+\contentsline {table}{\numberline {3.2}{\ignorespaces Entités principales du système Smart Water Monitoring.}}{18}{table.caption.29}%
+\contentsline {table}{\numberline {3.3}{\ignorespaces Structure de la base de données MySQL 8 - Tables principales.}}{20}{table.caption.31}%
+\contentsline {table}{\numberline {3.4}{\ignorespaces Pile technologique du système Smart Water Monitoring.}}{20}{table.caption.36}%
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }

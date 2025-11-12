@@ -1,0 +1,274 @@
+@startuml class_diagram
+!theme plain
+title Diagramme UML des classes - Smart Water Monitoring System
+
+package "model" {
+    enum TypeUtilisateur {
+        CITOYEN
+        ADMINISTRATEUR
+    }
+    
+    enum TypeCapteur {
+        EAU_FROIDE
+        EAU_CHAUDE
+        TOTAL
+    }
+    
+    enum TypeAlerte {
+        FUITE
+        SURCONSOMMATION
+        ANOMALIE
+    }
+    
+    class Utilisateur {
+        -idUtilisateur: Long
+        -nom: String
+        -email: String {unique}
+        -motDePasse: String
+        -adresse: String
+        -dateInscription: LocalDateTime
+        -type: TypeUtilisateur
+        -alertes: List<Alerte>
+        -capteurs: List<CapteurIoT>
+        -objectifs: List<ObjectifConsommation>
+        -historiques: List<HistoriqueConsommation>
+        -statistiques: List<Statistique>
+        ---
+        +Utilisateur()
+        +Utilisateur(nom, email, motDePasse, type)
+        +getters/setters
+    }
+    
+    class CapteurIoT {
+        -idCapteur: Long
+        -reference: String {unique}
+        -type: TypeCapteur
+        -emplacement: String
+        -etat: boolean
+        -dateInstallation: LocalDate
+        -seuilAlerte: double
+        -utilisateur: Utilisateur
+        ---
+        +CapteurIoT()
+        +CapteurIoT(reference, type, emplacement, utilisateur)
+        +getters/setters
+    }
+    
+    class DonneeCapteur {
+        -idDonnee: Long
+        -valeur: double
+        -timestamp: LocalDateTime
+        -capteur: CapteurIoT
+        ---
+        +DonneeCapteur()
+        +DonneeCapteur(valeur, capteur)
+        +getters/setters
+    }
+    
+    class Alerte {
+        -idAlerte: Long
+        -type: TypeAlerte
+        -dateCreation: LocalDateTime
+        -estLue: boolean
+        -message: String
+        -niveauUrgence: String
+        -utilisateur: Utilisateur
+        -donneeCapteur: DonneeCapteur
+        ---
+        +Alerte()
+        +Alerte(type, message, niveauUrgence, utilisateur)
+        +marquerCommeLue(): void
+        +getters/setters
+    }
+    
+    class ObjectifConsommation {
+        -idObjectif: Long
+        -valeurObjectif: double
+        -mois: int
+        -annee: int
+        -dateCreation: LocalDateTime
+        -utilisateur: Utilisateur
+        ---
+        +ObjectifConsommation()
+        +getProgressionPourcentage(): double
+        +getters/setters
+    }
+    
+    class HistoriqueConsommation {
+        -idHistorique: Long
+        -date: LocalDate
+        -consommationTotal: double
+        -consommationMoyenne: double
+        -picConsommation: double
+        -coutEstime: double
+        -nombreFuites: int
+        -utilisateur: Utilisateur
+        ---
+        +HistoriqueConsommation()
+        +getters/setters
+    }
+    
+    class Statistique {
+        -idStatistique: Long
+        -consommationMoyenneJour: double
+        -consommationMoyenneMois: double
+        -consommationMoyenneAnnee: double
+        -tendance: String
+        -derniereMAJ: LocalDateTime
+        -utilisateur: Utilisateur
+        ---
+        +Statistique()
+        +calculerTendance(): void
+        +getters/setters
+    }
+    
+    ' Relations
+    Utilisateur "1" --> "0..*" CapteurIoT : possède
+    Utilisateur "1" --> "0..*" Alerte : reçoit
+    Utilisateur "1" --> "0..*" ObjectifConsommation : fixe
+    Utilisateur "1" --> "0..*" HistoriqueConsommation : génère
+    Utilisateur "1" --> "0..*" Statistique : produit
+    
+    CapteurIoT "1" --> "0..*" DonneeCapteur : collecte
+    
+    DonneeCapteur "0..1" --> "1..*" Alerte : déclenche
+}
+
+package "dao" {
+    interface IDao<T> {
+        +create(o: T): boolean
+        +delete(o: T): boolean
+        +update(o: T): boolean
+        +findAll(): List<T>
+        +findById(id: Long): T
+    }
+    
+    abstract class AbstractDao<T> {
+        #sessionFactory: SessionFactory
+        ---
+        +create(o: T): boolean
+        +delete(o: T): boolean
+        +update(o: T): boolean
+        +findAll(): List<T>
+        +findById(id: Long): T
+    }
+    
+    class UtilisateurDAO
+    class CapteurIoTDAO
+    class DonneeCapteurDAO
+    class AlerteDAO
+    class HistoriqueConsommationDAO
+    class StatistiqueDAO
+    
+    IDao <|.. AbstractDao
+    AbstractDao <|-- UtilisateurDAO
+    AbstractDao <|-- CapteurIoTDAO
+    AbstractDao <|-- DonneeCapteurDAO
+    AbstractDao <|-- AlerteDAO
+    AbstractDao <|-- HistoriqueConsommationDAO
+    AbstractDao <|-- StatistiqueDAO
+}
+
+package "services" {
+    interface IService<T> {
+        +create(o: T): boolean
+        +delete(o: T): boolean
+        +update(o: T): boolean
+        +findAll(): List<T>
+        +findById(id: Long): T
+    }
+    
+    class UtilisateurService {
+        -utilisateurDao: UtilisateurDAO
+        ---
+        +findByEmail(email: String): Utilisateur
+        +findByEmailEtPassword(...): Utilisateur
+    }
+    
+    class CapteurIoTService {
+        -capteurDao: CapteurIoTDAO
+        ---
+        +findByCapteurAndUtilisateur(...): CapteurIoT
+    }
+    
+    class DonneeCapteurService {
+        -donneeCapteurDao: DonneeCapteurDAO
+        ---
+        +create(donnee: DonneeCapteur): boolean
+    }
+    
+    class AlerteService {
+        -alerteDao: AlerteDAO
+        ---
+        +findByUserId(userId: Long): List<Alerte>
+        +marquerCommeLue(alerteId: Long): boolean
+        +generateAlert(...): void
+    }
+    
+    class DataAggregationService {
+        -donneeCapteurDao: DonneeCapteurDAO
+        -historiqueDao: HistoriqueConsommationDAO
+        -statistiqueDao: StatistiqueDAO
+        ---
+        +aggregerDonneesJournee(date: LocalDate): int
+        +aggregerDonneesUtilisateur(...): boolean
+    }
+    
+    IService <|.. UtilisateurService
+    IService <|.. CapteurIoTService
+    IService <|.. DonneeCapteurService
+    IService <|.. AlerteService
+}
+
+package "security" {
+    class SecurityUtil {
+        {static} +hashPassword(password: String): String
+        {static} +checkPassword(password: String, hash: String): boolean
+    }
+}
+
+package "jobs" {
+    class DailyAggregationJob {
+        -aggregationService: DataAggregationService
+        -scheduler: ScheduledExecutorService
+        -heureExecution: LocalTime
+        {static} -instance: DailyAggregationJob
+        ---
+        {static} +getInstance(): DailyAggregationJob
+        +start(): void
+        +executerAggregation(): void
+        -calculerDelaiJusquaProchaineExecution(): long
+    }
+}
+
+' Dépendances
+UtilisateurService --> UtilisateurDAO
+CapteurIoTService --> CapteurIoTDAO
+DonneeCapteurService --> DonneeCapteurDAO
+AlerteService --> AlerteDAO
+DataAggregationService --> DonneeCapteurDAO
+DataAggregationService --> HistoriqueConsommationDAO
+DataAggregationService --> StatistiqueDAO
+DailyAggregationJob --> DataAggregationService
+
+note right of AbstractDao
+  Pattern DAO
+  Abstraction accès données
+end note
+
+note right of IService
+  Pattern Service
+  Encapsulation logique métier
+end note
+
+note right of DailyAggregationJob
+  Pattern Singleton
+  Instance unique du scheduler
+end note
+
+note right of SecurityUtil
+  Utilitaires sécurité
+  BCrypt 12 rounds
+end note
+
+@enduml
