@@ -32,6 +32,20 @@ public class CapteurIoTServlet extends HttpServlet {
         System.out.println("=== DEBUG CAPTEUR SERVLET (GET) ===");
 
         try {
+            String action = request.getParameter("action");
+            if (action == null) {
+                action = "list";
+            }
+
+            System.out.println("📋 Action: " + action);
+
+            // API publique pour le simulateur IoT (pas besoin d'authentification)
+            if ("listJson".equals(action)) {
+                listCapteursJson(request, response);
+                return;
+            }
+
+            // Pour toutes les autres actions, vérifier l'authentification
             HttpSession session = request.getSession();
             Utilisateur user = (Utilisateur) session.getAttribute("user");
 
@@ -47,13 +61,6 @@ public class CapteurIoTServlet extends HttpServlet {
             }
 
             System.out.println("👤 Admin connecté: " + user.getNom());
-
-            String action = request.getParameter("action");
-            if (action == null) {
-                action = "list";
-            }
-
-            System.out.println("📋 Action: " + action);
 
             switch (action) {
                 case "new":
@@ -245,6 +252,51 @@ public class CapteurIoTServlet extends HttpServlet {
             System.out.println("❌ ERREUR POST CapteurServlet: " + e.getMessage());
             e.printStackTrace();
             response.sendRedirect(request.getContextPath() + "/capteurs?error=true");
+        }
+    }
+
+    /**
+     * API pour retourner la liste des IDs de tous les capteurs en JSON
+     * URL: /capteurs?action=listJson
+     * Format de réponse: [1, 2, 3, 4, ...]
+     */
+    private void listCapteursJson(HttpServletRequest request, HttpServletResponse response) 
+            throws ServletException, IOException {
+        
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        
+        try {
+            // Récupérer tous les capteurs
+            List<CapteurIoT> capteurs = capteurIoTService.findAll();
+            
+            if (capteurs == null || capteurs.isEmpty()) {
+                response.getWriter().print("[]");
+                System.out.println("⚠️ Aucun capteur trouvé");
+                return;
+            }
+            
+            // Construire la liste des IDs en JSON
+            StringBuilder jsonBuilder = new StringBuilder("[");
+            for (int i = 0; i < capteurs.size(); i++) {
+                jsonBuilder.append(capteurs.get(i).getIdCapteur());
+                if (i < capteurs.size() - 1) {
+                    jsonBuilder.append(", ");
+                }
+            }
+            jsonBuilder.append("]");
+            
+            String jsonResponse = jsonBuilder.toString();
+            response.getWriter().print(jsonResponse);
+            
+            System.out.println("✅ API listJson: " + capteurs.size() + " capteurs retournés");
+            System.out.println("📤 Réponse: " + jsonResponse);
+            
+        } catch (Exception e) {
+            System.err.println("❌ Erreur API listJson: " + e.getMessage());
+            e.printStackTrace();
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            response.getWriter().print("{\"error\": \"" + e.getMessage() + "\"}");
         }
     }
 }
