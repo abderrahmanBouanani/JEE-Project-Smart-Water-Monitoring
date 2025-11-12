@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpSession;
 import model.Utilisateur;
 import model.TypeUtilisateur;
 import services.UtilisateurService;
+import util.SecurityUtil;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -78,7 +79,7 @@ public class UtilisateurServlet extends HttpServlet {
             Utilisateur newUser = new Utilisateur();
             newUser.setNom(nom);
             newUser.setEmail(email);
-            newUser.setMotDePasse(motDePasse); // Dans une vraie app, il faudrait hasher le mot de passe
+            newUser.setMotDePasse(SecurityUtil.hashPassword(motDePasse)); // Hash le mot de passe
             newUser.setAdresse(adresse);
             newUser.setType(type);
             newUser.setDateInscription(LocalDateTime.now());
@@ -94,7 +95,7 @@ public class UtilisateurServlet extends HttpServlet {
                 utilisateur.setType(type);
                 // Ne pas mettre à jour le mot de passe s'il est laissé vide
                 if (motDePasse != null && !motDePasse.isEmpty()) {
-                    utilisateur.setMotDePasse(motDePasse);
+                    utilisateur.setMotDePasse(SecurityUtil.hashPassword(motDePasse)); // Hash le nouveau mot de passe
                 }
                 success = utilisateurService.update(utilisateur);
             } else {

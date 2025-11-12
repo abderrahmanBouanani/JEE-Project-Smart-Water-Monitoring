@@ -5,6 +5,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import model.Utilisateur;
 import model.TypeUtilisateur;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.io.IOException;
 
@@ -12,6 +13,32 @@ import java.io.IOException;
  * Utility class for security checks and authorization
  */
 public class SecurityUtil {
+
+    /**
+     * Hash un mot de passe avec BCrypt
+     * 
+     * @param plainPassword Le mot de passe en clair
+     * @return Le mot de passe hashé
+     */
+    public static String hashPassword(String plainPassword) {
+        return BCrypt.hashpw(plainPassword, BCrypt.gensalt(12));
+    }
+
+    /**
+     * Vérifie si un mot de passe correspond au hash
+     * 
+     * @param plainPassword Le mot de passe en clair
+     * @param hashedPassword Le mot de passe hashé
+     * @return true si le mot de passe correspond, false sinon
+     */
+    public static boolean checkPassword(String plainPassword, String hashedPassword) {
+        try {
+            return BCrypt.checkpw(plainPassword, hashedPassword);
+        } catch (IllegalArgumentException e) {
+            // Hash invalide ou mal formé
+            return false;
+        }
+    }
 
     /**
      * Vérifie si l'utilisateur est authentifié

@@ -36,3 +36,50 @@ build/
 
 ### Mac OS ###
 .DS_Store
+
+# ==================== Configuration Files Sensibles ====================
+# Fichiers de configuration contenant des mots de passe
+src/main/resources/hibernate.cfg.xml
+src/test/resources/hibernate.cfg.xml
+
+# ==================== Base de données ====================
+*.db
+*.sqlite
+*.sql.backup
+
+# ==================== Python (Simulateur IoT) ====================
+__pycache__/
+*.py[cod]
+venv/
+env/
+.venv/
+*.egg-info/
+
+# ==================== LaTeX ====================
+*.aux
+*.log
+*.bbl
+*.blg
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+auxil/
+
+# ==================== Fichiers sensibles ====================
+.env
+.env.local
+*.pem
+*.key
+*.crt
+*.keystore
+
+# ==================== Logs ====================
+*.log
+logs/
+
+# ==================== Temporaires ====================
+*.tmp
+*.temp
+*.swp
+*.bak
+*.old

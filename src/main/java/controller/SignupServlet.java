@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import model.Utilisateur;
 import model.TypeUtilisateur;
 import services.UtilisateurService;
+import util.SecurityUtil;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -35,7 +36,7 @@ public class SignupServlet extends HttpServlet {
         Utilisateur newUser = new Utilisateur();
         newUser.setNom(nom);
         newUser.setEmail(email);
-        newUser.setMotDePasse(password); // Idéalement, hasher le mot de passe ici
+        newUser.setMotDePasse(SecurityUtil.hashPassword(password)); // Hash le mot de passe avec BCrypt
         newUser.setAdresse(adresse);
         newUser.setDateInscription(LocalDateTime.now());
         newUser.setType(TypeUtilisateur.CITOYEN); // Le type par défaut pour l'inscription

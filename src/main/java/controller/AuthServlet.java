@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpSession;
 import model.Utilisateur;
 import model.TypeUtilisateur;
 import services.UtilisateurService;
+import util.SecurityUtil;
 
 import java.io.IOException;
 
@@ -41,7 +42,8 @@ public class AuthServlet extends HttpServlet {
 
         Utilisateur utilisateur = utilisateurService.findByEmail(email);
 
-        if (utilisateur != null && utilisateur.getMotDePasse().equals(password)) {
+        // Vérification avec BCrypt pour les mots de passe hashés
+        if (utilisateur != null && SecurityUtil.checkPassword(password, utilisateur.getMotDePasse())) {
             HttpSession session = request.getSession();
             session.setAttribute("user", utilisateur);
 
