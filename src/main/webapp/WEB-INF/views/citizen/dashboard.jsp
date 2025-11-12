@@ -347,90 +347,9 @@
                 </div>
 
                 <!-- Main Widgets -->
-                <div class="row">
-                    <!-- Consommation en temps réel -->
-                    <div class="col-md-8">
-                        <div class="widget">
-                            <div class="widget-header">
-                                <h3 class="widget-title"><i class="fas fa-chart-line me-2 text-primary"></i>Consommation en temps réel</h3>
-                                <div class="btn-group">
-                                    <button class="btn btn-sm btn-outline-primary active">24h</button>
-                                    <button class="btn btn-sm btn-outline-primary">7j</button>
-                                    <button class="btn btn-sm btn-outline-primary">30j</button>
-                                </div>
-                            </div>
-                            <div class="consumption-chart">
-                                <canvas id="realtimeChart"></canvas>
-                            </div>
-                        </div>
-                    </div>
 
-                    <!-- Alertes récentes -->
-                    <div class="col-md-4">
-                        <div class="widget">
-                            <div class="widget-header">
-                                <h3 class="widget-title"><i class="fas fa-bell me-2 text-warning"></i>Alertes récentes</h3>
-                                <span class="badge bg-warning">3 nouvelles</span>
-                            </div>
-                            <div id="recentAlerts">
-                                <!-- Alertes chargées dynamiquement -->
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
-                <!-- Quick Actions & Capteurs -->
-                <div class="row mt-4">
-                    <div class="col-md-6">
-                        <div class="widget">
-                            <div class="widget-header">
-                                <h3 class="widget-title"><i class="fas fa-rocket me-2 text-success"></i>Accès rapide</h3>
-                            </div>
-                            <div class="row g-3">
-                                <div class="col-6">
-                                    <div class="quick-action" onclick="location.href='${pageContext.request.contextPath}/consommation/stats'">
-                                        <i class="fas fa-chart-pie"></i>
-                                        <h6>Rapports détaillés</h6>
-                                        <small class="text-muted">Analyses de consommation</small>
-                                    </div>
-                                </div>
-                                <div class="col-6">
-                                    <div class="quick-action" onclick="location.href='${pageContext.request.contextPath}/consommation/visualisation'">
-                                        <i class="fas fa-water"></i>
-                                        <h6>Réseau d'eau</h6>
-                                        <small class="text-muted">Vue du système</small>
-                                    </div>
-                                </div>
-                                <div class="col-6">
-                                    <div class="quick-action" onclick="location.href='${pageContext.request.contextPath}/mes-alertes'">
-                                        <i class="fas fa-bell"></i>
-                                        <h6>Gestion alertes</h6>
-                                        <small class="text-muted">Surveillance</small>
-                                    </div>
-                                </div>
-                                <div class="col-6">
-                                    <div class="quick-action" onclick="location.href='${pageContext.request.contextPath}/profil'">
-                                        <i class="fas fa-user-cog"></i>
-                                        <h6>Mon Compte</h6>
-                                        <small class="text-muted">Préférences</small>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
 
-                    <div class="col-md-6">
-                        <div class="widget">
-                            <div class="widget-header">
-                                <h3 class="widget-title"><i class="fas fa-faucet me-2 text-info"></i>État des compteurs</h3>
-                                <span class="badge bg-success">8/10 actifs</span>
-                            </div>
-                            <div id="sensorsStatus">
-                                <!-- État des compteurs chargé dynamiquement -->
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </c:if>
 
             <c:if test="${not empty contentPage}">
@@ -443,63 +362,50 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        // Initialisation de la date actuelle
-        document.getElementById('current-date').textContent = new Date().toLocaleDateString('fr-FR', {
-            weekday: 'long',
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-        });
-
-        // Données simulées pour SmartWater
+        // Données réelles du serveur - NE PLUS utiliser de données simulées
         const dashboardData = {
             recentAlerts: [
+                <c:forEach var="alerte" items="${alertesNonLues}" varStatus="status">
                 {
-                    type: 'SEUIL_DEPASSE',
-                    message: 'Débit anormal dans la salle de bain',
-                    time: 'Il y a 15 min',
-                    critical: true
-                },
-                {
-                    type: 'COMPTEUR_OFFLINE',
-                    message: 'Compteur cuisine hors ligne',
-                    time: 'Il y a 2h',
-                    critical: false
-                },
-                {
-                    type: 'FUITE_DETECTEE',
-                    message: 'Fuite possible détectée au garage',
-                    time: 'Il y a 5h',
-                    critical: true
-                }
+                    type: '${alerte.type}',
+                    message: '${alerte.message}',
+                    time: '${alerte.dateCreation}',
+                    critical: ${alerte.niveauUrgence == 'CRITIQUE'}
+                }<c:if test="${!status.last}">,</c:if>
+                </c:forEach>
             ],
             sensors: [
-                { name: 'COMP-001', location: 'Salle de bain', status: 'active', consumption: 45 },
-                { name: 'COMP-002', location: 'Cuisine', status: 'inactive', consumption: 0 },
-                { name: 'COMP-003', location: 'Jardin', status: 'active', consumption: 28 },
-                { name: 'COMP-004', location: 'Buanderie', status: 'active', consumption: 32 },
-                { name: 'COMP-005', location: 'Garage', status: 'active', consumption: 20 }
+                <c:forEach var="capteur" items="${capteurs}" varStatus="status">
+                {
+                    name: '${capteur.reference}',
+                    location: '${capteur.emplacement}',
+                    status: '${capteur.etat ? "active" : "inactive"}',
+                    consumption: 0 // À calculer si tu as des données de consommation
+                }<c:if test="${!status.last}">,</c:if>
+                </c:forEach>
             ]
         };
 
-        // Fonction pour obtenir la classe CSS selon le statut
-        function getStatusClass(status) {
-            return status === 'active' ? 'text-success' : 'text-secondary';
-        }
+        // Mettre à jour les statistiques avec les vraies données
+        function updateDashboardStats() {
+            // Utiliser les données réelles du serveur
+            document.getElementById('currentConsumption').textContent = ${consommationJour} + ' L';
+            document.getElementById('activeAlerts').textContent = ${alertesNonLues.size()};
+            document.getElementById('activeSensors').textContent = ${capteursActifs};
+            document.getElementById('dailyCost').textContent = ${coutJour} + '€';
 
-        // Fonction pour obtenir la classe badge selon le statut
-        function getBadgeClass(status) {
-            return status === 'active' ? 'bg-success' : 'bg-secondary';
-        }
-
-        // Fonction pour obtenir le texte du statut
-        function getStatusText(status) {
-            return status === 'active' ? 'Actif' : 'Inactif';
+            console.log('📊 Dashboard stats mises à jour:');
+            console.log('   - Consommation:', ${consommationJour});
+            console.log('   - Alertes actives:', ${alertesNonLues.size()});
+            console.log('   - Capteurs actifs:', ${capteursActifs});
+            console.log('   - Coût journalier:', ${coutJour});
         }
 
         // Fonction pour afficher les alertes récentes
         function displayRecentAlerts() {
             const container = document.getElementById('recentAlerts');
+            if (!container) return;
+
             container.innerHTML = '';
 
             dashboardData.recentAlerts.forEach(alert => {
@@ -512,111 +418,38 @@
                             '<strong>' + alert.type.replace('_', ' ') + '</strong><br>' +
                             '<small>' + alert.message + '</small>' +
                         '</div>' +
-                        '<small class="text-muted">' + alert.time + '</small>' +
+                        '<small class="text-muted">' + formatTimeAgo(alert.time) + '</small>' +
                     '</div>';
                 container.appendChild(alertElement);
             });
         }
 
-        // Fonction pour afficher l'état des compteurs
-        function displaySensorsStatus() {
-            const container = document.getElementById('sensorsStatus');
-            container.innerHTML = '';
+        // Fonction pour formater le temps
+        function formatTimeAgo(dateString) {
+            const date = new Date(dateString);
+            const now = new Date();
+            const diffMs = now - date;
+            const diffMins = Math.floor(diffMs / 60000);
+            const diffHours = Math.floor(diffMs / 3600000);
 
-            dashboardData.sensors.forEach(sensor => {
-                const statusClass = getStatusClass(sensor.status);
-                const badgeClass = getBadgeClass(sensor.status);
-                const statusText = getStatusText(sensor.status);
-
-                const sensorElement = document.createElement('div');
-                sensorElement.className = 'd-flex justify-content-between align-items-center mb-3 p-2 border rounded';
-                sensorElement.innerHTML =
-                    '<div class="d-flex align-items-center">' +
-                        '<div class="me-3">' +
-                            '<i class="fas fa-faucet ' + statusClass + '"></i>' +
-                        '</div>' +
-                        '<div>' +
-                            '<strong>' + sensor.name + '</strong><br>' +
-                            '<small class="text-muted">' + sensor.location + '</small>' +
-                        '</div>' +
-                    '</div>' +
-                    '<div class="text-end">' +
-                        '<div class="fw-bold">' + sensor.consumption + ' L</div>' +
-                        '<span class="badge ' + badgeClass + '">' + statusText + '</span>' +
-                    '</div>';
-                container.appendChild(sensorElement);
-            });
-        }
-
-        // Graphique de consommation en temps réel
-        function initRealtimeChart() {
-            const ctx = document.getElementById('realtimeChart').getContext('2d');
-            const chart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: ['00h', '04h', '08h', '12h', '16h', '20h', '24h'],
-                    datasets: [{
-                        label: 'Consommation (L)',
-                        data: [25, 18, 45, 125, 85, 60, 35],
-                        borderColor: '#3498db',
-                        backgroundColor: 'rgba(52, 152, 219, 0.1)',
-                        borderWidth: 2,
-                        fill: true,
-                        tension: 0.4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: false
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: 'Litres (L)'
-                            },
-                            grid: {
-                                drawBorder: false
-                            }
-                        },
-                        x: {
-                            grid: {
-                                display: false
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        // Simulation de mises à jour en temps réel
-        function simulateRealTimeUpdates() {
-            setInterval(function() {
-                // Mettre à jour la consommation actuelle
-                const currentConsumption = document.getElementById('currentConsumption');
-                const randomValue = (100 + Math.random() * 50).toFixed(0);
-                currentConsumption.textContent = randomValue + ' L';
-
-                // Mettre à jour le coût journalier (environ 0.003€/L)
-                const dailyCost = document.getElementById('dailyCost');
-                const cost = (parseFloat(randomValue) * 0.003).toFixed(2);
-                dailyCost.textContent = cost + '€';
-            }, 5000);
+            if (diffMins < 60) {
+                return 'Il y a ' + diffMins + ' min';
+            } else if (diffHours < 24) {
+                return 'Il y a ' + diffHours + ' h';
+            } else {
+                return date.toLocaleDateString('fr-FR');
+            }
         }
 
         // Initialisation
         document.addEventListener('DOMContentLoaded', function() {
             // Ne charger les widgets que si on est sur la page d'accueil (pas de contentPage)
             if (document.getElementById('currentConsumption')) {
+                updateDashboardStats();
                 displayRecentAlerts();
-                displaySensorsStatus();
-                initRealtimeChart();
-                simulateRealTimeUpdates();
+
+                // Désactiver les mises à jour simulées
+                // simulateRealTimeUpdates(); // ← COMMENTE ou SUPPRIME cette ligne
 
                 // Gestion des boutons de période
                 document.querySelectorAll('.btn-group .btn').forEach(function(btn) {

@@ -1,6 +1,6 @@
 package model;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.time.LocalDate;
 
 @Entity
@@ -10,6 +10,7 @@ public class HistoriqueConsommation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idHistorique;
 
+    @Temporal(TemporalType.DATE)
     private LocalDate date;
 
     private double volumeTotal;

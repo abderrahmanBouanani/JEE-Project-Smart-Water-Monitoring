@@ -6,9 +6,11 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import model.Alerte;
 import model.TypeAlerte;
 import model.Utilisateur;
+import model.TypeUtilisateur;
 import services.AlerteService;
 import services.UtilisateurService;
 
@@ -24,6 +26,20 @@ public class AlerteServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        // 🛡️ Vérifier que l'utilisateur est un ADMINISTRATEUR
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("user") == null) {
+            response.sendRedirect(request.getContextPath() + "/login.jsp");
+            return;
+        }
+
+        Utilisateur user = (Utilisateur) session.getAttribute("user");
+        if (user.getType() != TypeUtilisateur.ADMINISTRATEUR) {
+            System.err.println("❌ ACCÈS REFUSÉ: Utilisateur " + user.getNom() + " tente d'accéder à la gestion des alertes");
+            response.sendRedirect(request.getContextPath() + "/dashboard");
+            return;
+        }
+
         String action = request.getParameter("action");
         if (action == null) {
             action = "list";
@@ -98,23 +114,65 @@ public class AlerteServlet extends HttpServlet {
     }
 
     private void listAlertes(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        List<Alerte> alertes = alerteService.findAll();
-        request.setAttribute("alertes", alertes);
-        RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/views/alerte/list.jsp");
-        dispatcher.forward(request, response);
+        System.out.println("=== DEBUG ALERTE SERVLET - LIST ===");
+        try {
+            System.out.println("📦 Récupération de toutes les alertes...");
+            List<Alerte> alertes = alerteService.findAll();
+            
+            if (alertes == null) {
+                System.out.println("⚠️ alerteService.findAll() a retourné null");
+                alertes = new java.util.ArrayList<>();
+            } else {
+                System.out.println("✅ " + alertes.size() + " alertes récupérées");
+            }
+            
+            request.setAttribute("alertes", alertes);
+            System.out.println("🚀 Forward vers la JSP...");
+            RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/views/alerte/list.jsp");
+            dispatcher.forward(request, response);
+            System.out.println("✅ Forward réussi");
+        } catch (Exception e) {
+            System.err.println("❌ ERREUR dans listAlertes: " + e.getClass().getName());
+            System.err.println("❌ Message: " + e.getMessage());
+            System.err.println("❌ Stack trace:");
+            e.printStackTrace();
+            request.setAttribute("error", "Erreur lors du chargement des alertes: " + e.getMessage());
+            request.setAttribute("alertes", new java.util.ArrayList<>());
+            RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/views/alerte/list.jsp");
+            dispatcher.forward(request, response);
+        }
     }
 
     private void showNewForm(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        request.setAttribute("typesAlerte", TypeAlerte.values());
-        RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/views/alerte/form.jsp");
-        dispatcher.forward(request, response);
+        try {
+            request.setAttribute("typesAlerte", TypeAlerte.values());
+            List<Utilisateur> utilisateurs = utilisateurService.findAll();
+            if (utilisateurs == null) {
+                utilisateurs = new java.util.ArrayList<>();
+            }
+            request.setAttribute("utilisateurs", utilisateurs);
+            RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/views/alerte/form.jsp");
+            dispatcher.forward(request, response);
+        } catch (Exception e) {
+            System.err.println("Error showing new form: " + e.getMessage());
+            e.printStackTrace();
+            request.setAttribute("error", "Erreur lors du chargement du formulaire");
+            request.setAttribute("typesAlerte", TypeAlerte.values());
+            request.setAttribute("utilisateurs", new java.util.ArrayList<>());
+            RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/views/alerte/form.jsp");
+            dispatcher.forward(request, response);
+        }
     }
 
     private void showEditForm(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         Long id = Long.parseLong(request.getParameter("id"));
+        System.out.println("📝 Modification alerte ID: " + id);
+
         Alerte alerteExistante = alerteService.findById(id);
         request.setAttribute("alerte", alerteExistante);
         request.setAttribute("typesAlerte", TypeAlerte.values());
+        request.setAttribute("utilisateurs", utilisateurService.findAll());
+
         RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/views/alerte/form.jsp");
         dispatcher.forward(request, response);
     }

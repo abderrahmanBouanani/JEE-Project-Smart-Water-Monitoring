@@ -33,4 +33,9 @@ public class HistoriqueConsommationService implements IService<HistoriqueConsomm
     public HistoriqueConsommation findById(Long id) {
         return historiqueConsommationDao.findById(id);
     }
+
+    // NOUVELLE MÉTHODE
+    public List<HistoriqueConsommation> findByUserId(Long userId) {
+        return historiqueConsommationDao.findByUserId(userId);
+    }
 }

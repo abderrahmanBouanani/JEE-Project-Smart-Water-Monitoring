@@ -2,7 +2,6 @@ package services;
 
 import dao.CapteurIoTDao;
 import model.CapteurIoT;
-
 import java.util.List;
 
 public class CapteurIoTService implements IService<CapteurIoT> {
@@ -32,5 +31,19 @@ public class CapteurIoTService implements IService<CapteurIoT> {
     @Override
     public CapteurIoT findById(Long id) {
         return capteurIoTDao.findById(id);
+    }
+
+    // ✅ NOUVELLES MÉTHODES
+    public List<CapteurIoT> findByUserId(Long userId) {
+        return capteurIoTDao.findByUserId(userId);
+    }
+
+    public long countActiveByUserId(Long userId) {
+        return capteurIoTDao.countActiveByUserId(userId);
+    }
+
+    public long countTotalByUserId(Long userId) {
+        List<CapteurIoT> capteurs = findByUserId(userId);
+        return capteurs.size();
     }
 }

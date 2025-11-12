@@ -48,9 +48,16 @@
 
     <!-- Hibernate & JPA -->
     <dependency>
-      <groupId>org.hibernate</groupId>
+      <groupId>org.hibernate.orm</groupId>
       <artifactId>hibernate-core</artifactId>
-      <version>5.6.15.Final</version>
+      <version>6.4.4.Final</version>
+    </dependency>
+
+    <!-- Jakarta Persistence API (required for Hibernate 6) -->
+    <dependency>
+      <groupId>jakarta.persistence</groupId>
+      <artifactId>jakarta.persistence-api</artifactId>
+      <version>3.1.0</version>
     </dependency>
 
     <!-- MySQL Driver -->
@@ -81,6 +88,18 @@
       <groupId>org.apache.logging.log4j</groupId>
       <artifactId>log4j-core</artifactId>
       <version>2.20.0</version>
+    </dependency>
+      <dependency>
+          <groupId>javax.servlet</groupId>
+          <artifactId>jstl</artifactId>
+          <version>1.2</version>
+      </dependency>
+
+    <!-- GSON for JSON processing -->
+    <dependency>
+      <groupId>com.google.code.gson</groupId>
+      <artifactId>gson</artifactId>
+      <version>2.10.1</version>
     </dependency>
 
   </dependencies>

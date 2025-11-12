@@ -1,6 +1,6 @@
 package model;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
@@ -18,6 +18,8 @@ public class Statistique {
     @Column(length = 50)
     private String periode;
 
+    @Column(nullable = false)
+    @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime dateGeneration;
 
     @ManyToOne(fetch = FetchType.LAZY)

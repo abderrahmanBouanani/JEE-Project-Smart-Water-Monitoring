@@ -6,14 +6,84 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import model.Statistique;
+import model.Utilisateur;
+import services.StatistiqueService;
 import java.io.IOException;
+import java.util.List;
 
 @WebServlet(name = "StatistiquesServlet", urlPatterns = {"/consommation/stats"})
 public class StatistiquesServlet extends HttpServlet {
+
+    private final StatistiqueService statistiqueService = new StatistiqueService();
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // Chargez directement stats.jsp sans JSTL
-        RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/views/citizen/stats.jsp");
-        dispatcher.forward(request, response);
+        System.out.println("=== DEBUG STATISTIQUES SERVLET ===");
+
+        try {
+            HttpSession session = request.getSession();
+            Utilisateur user = (Utilisateur) session.getAttribute("user");
+
+            if (user == null) {
+                response.sendRedirect(request.getContextPath() + "/login.jsp");
+                return;
+            }
+
+            // DEBUG: Afficher l'utilisateur connecté
+            System.out.println("👤 Utilisateur connecté: ID=" + user.getIdUtilisateur() + ", Nom=" + user.getNom());
+
+            // ✅ Récupérer les statistiques SPÉCIFIQUES à cet utilisateur
+            System.out.println("📦 Récupération des statistiques POUR L'UTILISATEUR ID: " + user.getIdUtilisateur());
+            List<Statistique> statistiques = statistiqueService.findByUserId(user.getIdUtilisateur());
+
+            System.out.println("✅ Statistiques récupérées: " + statistiques.size() + " enregistrements");
+
+            // Afficher le détail des statistiques
+            for (Statistique stat : statistiques) {
+                System.out.println("📊 " + stat.getType() + " - " + stat.getValeur() + " (" + stat.getPeriode() + ")");
+            }
+
+            // Calculer quelques métriques pour les graphiques
+            Double consommationMoyenne = statistiqueService.getConsommationMoyenneByUserId(user.getIdUtilisateur());
+            Double consommationTotale = statistiqueService.getConsommationTotaleByUserId(user.getIdUtilisateur());
+
+            // Données simulées pour les graphiques (à remplacer par de vraies données)
+            // Pour l'instant, on utilise des données de test si pas de données réelles
+            double[] donneesQuotidiennes = {12.5, 19.2, 8.7, 15.3, 12.8, 18.6, 14.1};
+            double[] donneesMensuelles = {450, 420, 380, 350, 320, 300};
+            double[] donneesMoyennes = {15.2, 350, 4200};
+
+            if (consommationMoyenne != null) {
+                donneesMoyennes[0] = consommationMoyenne;
+            }
+            if (consommationTotale != null) {
+                donneesMoyennes[2] = consommationTotale;
+            }
+
+            // ENVOYER LES DONNÉES À LA JSP
+            request.setAttribute("statistiques", statistiques);
+            request.setAttribute("userId", user.getIdUtilisateur());
+            request.setAttribute("consommationMoyenne", consommationMoyenne);
+            request.setAttribute("consommationTotale", consommationTotale);
+
+            // Données pour les graphiques
+            request.setAttribute("donneesQuotidiennes", donneesQuotidiennes);
+            request.setAttribute("donneesMensuelles", donneesMensuelles);
+            request.setAttribute("donneesMoyennes", donneesMoyennes);
+
+            System.out.println("🚀 Forward vers la JSP...");
+
+            RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/views/citizen/stats.jsp");
+            dispatcher.forward(request, response);
+
+        } catch (Exception e) {
+            System.out.println("❌ ERREUR Statistiques: " + e.getMessage());
+            e.printStackTrace();
+            request.setAttribute("error", "Erreur lors du chargement des statistiques: " + e.getMessage());
+            RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/views/citizen/stats.jsp");
+            dispatcher.forward(request, response);
+        }
     }
 }

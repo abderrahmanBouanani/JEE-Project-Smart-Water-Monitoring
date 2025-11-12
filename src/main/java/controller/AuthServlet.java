@@ -45,13 +45,17 @@ public class AuthServlet extends HttpServlet {
             HttpSession session = request.getSession();
             session.setAttribute("user", utilisateur);
 
+            // DEBUG: Afficher le type dans les logs
+            System.out.println("Utilisateur connecté: " + utilisateur.getEmail() + " - Type: " + utilisateur.getType());
+
             // Redirection en fonction du rôle
             if (utilisateur.getType() == TypeUtilisateur.ADMINISTRATEUR) {
+                System.out.println("Redirection vers page ADMIN");
                 response.sendRedirect(request.getContextPath() + "/index.jsp");
             } else if (utilisateur.getType() == TypeUtilisateur.CITOYEN) {
+                System.out.println("Redirection vers page CITOYEN");
                 response.sendRedirect(request.getContextPath() + "/dashboard");
             } else {
-                // Fallback pour d'autres types d'utilisateurs si nécessaire
                 response.sendRedirect(request.getContextPath() + "/login.jsp");
             }
         } else {
