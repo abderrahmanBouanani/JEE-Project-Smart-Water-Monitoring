@@ -1,111 +1,174 @@
 \chapter{Technologies et réalisation}
 
-Ce chapitre décrit l'ensemble des technologies, outils et méthodes qui ont été utilisés pour la mise en œuvre du projet. Il présente d'abord les choix techniques, puis détaille l'environnement de déploiement, l'implémentation du système (structure du code et interfaces utilisateur), ainsi que la stratégie de tests appliquée. Enfin, une conclusion synthétique fait le point sur les réalisations et les éventuelles difficultés rencontrées.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Introduction}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-Dans cette section introductive, l'objectif est de donner une vue d'ensemble des aspects techniques et pratiques abordés dans ce chapitre. On y explique notamment :
-\begin{itemize}
-    \item Les choix technologiques réalisés en fonction des besoins fonctionnels et des contraintes techniques.
-    \item La manière dont l'environnement de déploiement est configuré pour supporter le système.
-    \item Les détails de l'implémentation du code et de l'interface utilisateur.
-    \item La stratégie adoptée pour valider et tester le système.
-\end{itemize}
-Cette partie prépare le lecteur à comprendre comment les décisions prises au niveau de la conception se traduisent concrètement lors de la réalisation.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Choix techniques et outils}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-Cette section détaille les principales technologies et outils qui ont été sélectionnés pour le développement du projet.
+Ce chapitre présente la mise en œuvre du système \textbf{Smart Water Monitoring}. Nous détaillons les technologies utilisées, l'organisation du code, les interfaces développées et les fonctionnalités implémentées pour répondre aux besoins des citoyens et administrateurs.
 
-\subsection{Langages, Frameworks, Bases de données…}
-\begin{itemize}
-    \item \textbf{Langages de programmation :}  
-    Justifier le choix du ou des langages (par exemple, Java pour la robustesse et la scalabilité, Python pour la rapidité de développement ou JavaScript/React pour le front-end interactif).
-    \item \textbf{Frameworks :}  
-    Expliquer la sélection des frameworks, tels que Spring Boot pour le back-end, React ou Angular pour le front-end, ou encore d'autres frameworks spécifiques à la tâche.
-    \item \textbf{Bases de données :}  
-    Préciser le type de base de données utilisée (relationnelle comme MySQL/PostgreSQL ou NoSQL comme MongoDB) en fonction des critères de performance, de flexibilité et de volume de données.
-    \item \textbf{Critères de sélection :}  
-    Indiquer les critères qui ont guidé ces choix, par exemple la taille de la communauté, la robustesse, la simplicité d'intégration et la performance.
-\end{itemize}
-Exemple d'utilisation des références : 
-Dans ce rapport, diverses références ont été utilisées pour étayer la démarche adoptée. Par exemple, la conception de sites web modernes est détaillée dans \cite{duckett2011html}, tandis que \cite{horstmann2014jee} offre une vue d'ensemble de l'architecture Java EE. Pour une approche approfondie de l'ORM avec Hibernate, on peut se référer à \cite{bauer2007hibernate}. Enfin, \cite{keogh2002jsp} fournit un guide complet sur le développement de JavaServer Pages.
+L'objectif est de montrer comment les spécifications du projet ont été concrétisées en une application web fonctionnelle permettant la surveillance intelligente de la consommation d'eau.
 
-\subsection{Outils de développement (IDE, gestion de versions…)}
-\begin{itemize}
-    \item \textbf{Environnement de développement intégré (IDE) :}  
-    Mentionner les outils utilisés, par exemple VS Code, Eclipse ou IntelliJ IDEA, et expliquer pourquoi ces outils ont été privilégiés.
-    \item \textbf{Système de gestion de versions :}  
-    Indiquer l'utilisation d'un outil comme Git (hébergé sur GitHub ou GitLab) pour assurer le suivi des modifications, faciliter la collaboration et la gestion du code source.
-    \item \textbf{Autres outils de collaboration et de tests :}  
-    Par exemple, l'utilisation de Maven ou Gradle pour la gestion de projet, ainsi que des outils de CI/CD pour automatiser les builds et les tests.
-\end{itemize}
+\section{Choix techniques}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Architecture de déploiement}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-Cette section décrit l'infrastructure sur laquelle le système sera déployé et les outils utilisés pour assurer son fonctionnement continu.
+\subsection{Technologies utilisées}
 
 \begin{itemize}
-    \item \textbf{Environnement cible :}  
-    Décrire le ou les serveurs, l'utilisation éventuelle de conteneurs (Docker) ou du cloud (AWS, Azure, Google Cloud), ainsi que les systèmes d'exploitation concernés.
-    \item \textbf{Pipeline d'intégration continue (CI/CD) :}  
-    Indiquer si un pipeline CI/CD a été mis en place pour automatiser les phases de build, de tests et de déploiement, et présenter les outils utilisés (Jenkins, GitLab CI, Travis CI, etc.).
+    \item \textbf{Backend} : Java EE avec Servlets et JSP
+    \item \textbf{Base de données} : MySQL pour le stockage des données
+    \item \textbf{ORM} : Hibernate pour la gestion de la persistance
+    \item \textbf{Frontend} : HTML, CSS/Bootstrap, JavaScript avec JSP
+    \item \textbf{Simulation} : Python pour les capteurs virtuels
 \end{itemize}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Implémentation et interfaces}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-Cette section est consacrée à la description de l'implémentation du système ainsi qu'à la présentation des interfaces utilisateur.
+\subsection{Outils de développement}
 
 \begin{itemize}
-    \item \textbf{Structure du code :}  
-    Exposer l'organisation du code en packages ou modules. Décrire brièvement la répartition entre le front-end, la logique métier et la couche de données.
-    \item \textbf{Interfaces utilisateur :}  
-    Présenter l’interface graphique à travers des captures d’écran ou des maquettes. Décrire les principales fonctionnalités disponibles pour l’utilisateur final.
-    \item \textbf{Fonctionnalités principales :}  
-    Détaillez les fonctionnalités clés implémentées, tant côté front-end (navigation, formulaires, affichage des données) que côté back-end (gestion des requêtes, traitement des données, sécurité).
+    \item \textbf{Environnement} : IntelliJ IDEA pour Java, VS Code pour Python
+    \item \textbf{Versioning} : Git avec GitHub
+    \item \textbf{Base de données} : MySQL Workbench
+    \item \textbf{Serveur} : Apache Tomcat
 \end{itemize}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Stratégie de tests}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-Pour garantir la qualité et la robustesse du système, une stratégie de tests complète a été mise en place.
+\section{Architecture du système}
+
+Le système suit une architecture trois couches classique :
 
 \begin{itemize}
-    \item \textbf{Tests unitaires :}  
-    Décrire la couverture des tests unitaires qui vérifient le fonctionnement de chaque composant individuel (par exemple, avec JUnit, pytest, etc.).
-    \item \textbf{Tests d'intégration :}  
-    Expliquer comment les différents modules du système ont été testés ensemble pour s'assurer de la bonne communication entre eux.
-    \item \textbf{Tests système :}  
-    Préciser si des tests globaux ont été effectués pour valider le comportement complet du système, incluant l’interface utilisateur.
-    \item \textbf{Outils de test et plan de validation :}  
-    Mentionner les outils utilisés (Selenium pour les tests d’interface, Postman pour les API, etc.) et résumer le plan de validation ainsi que les résultats obtenus de manière synthétique.
+    \item \textbf{Couche présentation} : Pages JSP pour l'interface utilisateur
+    \item \textbf{Couche métier} : Servlets et services Java pour la logique applicative
+    \item \textbf{Couche données} : Hibernate et MySQL pour la persistance
 \end{itemize}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Implémentation}
+
+\subsection{Structure du projet}
+
+Le code est organisé en packages selon les responsabilités :
+
+\begin{verbatim}
+src/
+├── main/
+│   ├── java/
+│   │   ├── controller/          # Gestion des requêtes HTTP
+│   │   ├── dao/                 # Accès aux données
+│   │   ├── filter/              # Filtres de sécurité
+│   │   ├── model/               # Entités métier
+│   │   ├── services/            # Logique métier
+│   │   └── jobs/                # Tâches planifiées
+│   ├── resources/
+│   │   └── META-INF/
+│   │       └── persistence.xml  # Configuration base de données
+│   └── webapp/
+│       ├── WEB-INF/
+│       │   └── web.xml          # Configuration déploiement
+│       ├── views/               # Pages d'interface
+│       ├── login.jsp
+│       ├── signup.jsp
+│       └── index.jsp
+└── test/
+    └── java/                    # Tests unitaires
+\end{verbatim}
+\subsection{Interfaces utilisateur}
+
+\subsubsection{Interface citoyen}
+
+L'interface citoyen offre les fonctionnalités suivantes :
+
+\begin{itemize}
+    \item Tableau de bord avec consommation en temps réel
+    \item Visualisation des historiques et graphiques
+    \item Consultation des alertes personnelles
+    \item Profil utilisateur
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{figures/dashboard_citoyen.png}
+    \caption{Tableau de bord citoyen}
+    \label{fig:dashboard_citoyen}
+\end{figure}
+
+\subsubsection{Interface administrateur}
+
+L'interface administrateur comprend :
+
+\begin{itemize}
+    \item Supervision globale du système
+    \item Gestion des utilisateurs et capteurs
+    \tableau de bord avec statistiques agrégées
+    \item Rapports et analyses
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{figures/dashboard_admin.png}
+    \caption{Tableau de bord administrateur}
+    \label{fig:dashboard_admin}
+\end{figure}
+
+\subsection{Fonctionnalités principales}
+
+\subsubsection{Côté client}
+
+\begin{itemize}
+    \item Authentification sécurisée
+    \item Navigation intuitive selon le profil
+    \item Affichage des données en temps réel
+    \item Graphiques de consommation
+    \item Gestion des formulaires
+\end{itemize}
+
+\subsubsection{Côté serveur}
+
+\begin{itemize}
+    \item API REST pour la collecte des données
+    \item Gestion des sessions utilisateur
+    \item Système de sécurité avec rôles
+    \item Traitement et agrégation des données
+    \item Génération automatique d'alertes
+\end{itemize}
+
+\subsubsection{Simulateur IoT}
+
+\begin{itemize}
+    \item Génération de données réalistes
+    \item Envoi périodique vers le backend
+    \item Gestion des patterns de consommation
+    \item Configuration flexible
+\end{itemize}
+
+\section{Stratégie de validation}
+
+Pour assurer la qualité du système, plusieurs types de tests ont été réalisés :
+
+\subsection{Tests unitaires}
+
+\begin{itemize}
+    \item Validation de la logique métier
+    \item Tests des services utilisateur et alertes
+    \item Vérification des mots de passe
+\end{itemize}
+
+\subsection{Tests d'intégration}
+
+\begin{itemize}
+    \item Validation des workflows complets
+    \item Tests de l'API de collecte de données
+    \item Vérification de la persistance
+\end{itemize}
+
+\subsection{Tests manuels}
+
+\begin{itemize}
+    \item Validation des interfaces utilisateur
+    \item Tests de navigation et ergonomie
+    \item Vérification des scénarios métier
+\end{itemize}
+
 \section{Conclusion}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-Pour clore ce chapitre, il est important de faire un bilan sur l’ensemble des décisions techniques et 
-de réalisation qui ont été prises :
 
-\begin{itemize}
-    \item \textbf{Synthèse des choix techniques :}  
-    Récapituler les technologies, outils et méthodologies adoptés, en insistant sur leur adéquation 
-    avec les besoins du projet (simplicité d’utilisation, performance, évolutivité, etc.).
-    \item \textbf{Retour sur l'architecture de déploiement et l'implémentation :}  
-    Expliquer brièvement comment l'environnement de déploiement et la structure du code assurent la 
-    stabilité et la pérennité du système.
-    \item \textbf{Perspectives et défis :}  
-    Mentionner les difficultés éventuelles rencontrées lors de l’implémentation (limitations techniques, 
-    problèmes d’intégration, etc.) et indiquer les pistes d’amélioration à envisager pour les phases ultérieures.
-    \item \textbf{Transition vers le chapitre suivant :}  
-    Annoncer que les éléments techniques présentés ici constitueront la base pour l’implémentation 
-    concrète du système, qui sera détaillée dans le chapitre de réalisation pratique.
-\end{itemize}
+Ce chapitre a présenté la mise en œuvre technique du système Smart Water Monitoring. L'application web développée répond aux objectifs fixés en permettant la surveillance en temps réel de la consommation d'eau.
 
-\noindent
-Ce chapitre constitue ainsi un socle technique solide, garantissant que les choix de développement 
-sont cohérents avec les objectifs du projet et prêts à être mis en œuvre lors de la phase de réalisation.
+L'architecture en trois couches a structuré efficacement le développement, tandis que les technologies Java EE et MySQL ont fourni une base solide pour l'implémentation. Les interfaces utilisateur offrent une expérience adaptée aux différents profils, avec des tableaux de bord dédiés pour le suivi personnel et la gestion administrative.
+
+Le système intègre avec succès les fonctionnalités principales : collecte de données via des capteurs virtuels, traitement automatique, génération d'alertes et visualisation des consommations. Les mécanismes de sécurité assurent la protection des données utilisateurs.
+
+Cette réalisation démontre la faisabilité technique d'une solution complète de monitoring intelligent de l'eau.
