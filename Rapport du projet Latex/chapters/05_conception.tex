@@ -9,7 +9,7 @@ Ce chapitre traduit les besoins fonctionnels et non fonctionnels identifiés aux
 
 \subsection{Choix d'une architecture monolithique en couches}
 
-Le système Smart Water Monitoring adopte une \textbf{architecture monolithique en trois couches} basée sur le patron Modèle-Vue-Contrôleur (MVC), implémenté avec Jakarta EE (anciennement Java EE).
+Le système Smart Water Monitoring adopte une \textbf{architecture monolithique en trois couches} basée sur le patron Modèle-Vue-Contrôleur (MVC) \cite{fowler2002patterns}, implémenté avec Jakarta EE (anciennement Java EE).
 
 
 
@@ -28,7 +28,7 @@ Volume données & ✓ Bon (peu de calls) & Problématique \\ \hline
 \end{tabular}
 \end{table}
 
-Pour un projet académique de module JEE avec des contraintes de temps et volume de données limité, la monolithique s'avère plus appropriée. Elle permet de :
+Pour un projet académique de module JEE avec des contraintes de temps et volume de données limité, la monolithique s'avère plus appropriée \cite{richards2020architecture, newman2015microservices}. Elle permet de :
 \begin{itemize}
     \item Développer rapidement avec un framework unifié (Jakarta EE).
     \item Éviter la complexité des appels réseau inter-services.
@@ -130,7 +130,7 @@ La figure \ref{fig:class_diagram} présente le diagramme UML des classes du doma
 
 \begin{figure}[ht]
     \centering
-    \includegraphics[width=0.95\linewidth]{figures/WMS_class_diagram}
+    \includegraphics[width=0.95\linewidth]{figures/WMS_class_diagram.png}
     \caption{Diagramme UML des classes du système montrant les entités, leurs attributs, et les relations de multiplicité.}
     \label{fig:class_diagram}
 \end{figure}
@@ -214,7 +214,7 @@ La figure \ref{fig:wms_sequence} illustre le workflow complet depuis l'authentif
 
 \section{Patterns de conception}
 
-Le système utilise plusieurs patterns reconnus :
+Le système utilise plusieurs patterns reconnus \cite{fowler2002patterns} :
 
 \subsection{Pattern DAO}
 Abstrait l'accès aux données via \texttt{AbstractDao<T>} et DAOs spécialisés.

@@ -1,0 +1,486 @@
+\chapter*{Annexe : Implémentation du Simulateur IoT et Système d'Agrégation}
+\addcontentsline{toc}{chapter}{Annexe : Implémentation du Simulateur IoT et Système d'Agrégation}
+\label{appn:C}
+
+Cette annexe décrit en détail l'implémentation du simulateur IoT en Python et le système d'agrégation automatique des données côté backend Java.
+
+\section{Simulateur IoT Python}
+
+\subsection{Architecture du simulateur}
+
+Le simulateur IoT a été développé en Python pour générer des données réalistes de consommation d'eau et simuler le comportement de multiples capteurs connectés. Le script \texttt{iot\_simulator.py} implémente une architecture orientée objet avec la classe principale \texttt{IoTSimulator}.
+
+\subsubsection{Dépendances et configuration}
+
+Le simulateur nécessite uniquement la bibliothèque \texttt{requests} pour la communication HTTP avec le backend :
+
+\begin{lstlisting}[language=bash, caption={Installation des dépendances}]
+pip install requests
+\end{lstlisting}
+
+Les paramètres de configuration par défaut sont :
+\begin{itemize}
+    \item \textbf{URL du backend} : \texttt{http://localhost:8080/SmartWaterMonitoring}
+    \item \textbf{Intervalle d'envoi} : 60 secondes (1 minute)
+    \item \textbf{Consommation minimale} : 0.1 litre
+    \item \textbf{Consommation maximale} : 50.0 litres
+    \item \textbf{Probabilité d'alerte} : 3\% par mesure
+\end{itemize}
+
+\subsection{Génération de données réalistes}
+
+Le simulateur implémente un modèle de consommation réaliste basé sur l'heure de la journée :
+
+\subsubsection{Modèle temporel}
+
+Trois profils de consommation ont été définis :
+
+\begin{itemize}
+    \item \textbf{Heures de pointe} (7h-8h, 12h-13h, 19h-21h) :
+    \begin{itemize}
+        \item Multiplicateur : 2.0
+        \item Consommation de base : 20 litres
+        \item Correspond aux périodes de forte utilisation (matin, midi, soir)
+    \end{itemize}
+    
+    \item \textbf{Heures creuses} (1h-5h, 23h) :
+    \begin{itemize}
+        \item Multiplicateur : 0.3
+        \item Consommation de base : 5 litres
+        \item Correspond aux périodes de repos nocturne
+    \end{itemize}
+    
+    \item \textbf{Heures normales} (autres périodes) :
+    \begin{itemize}
+        \item Multiplicateur : 1.0
+        \item Consommation de base : 12 litres
+        \item Activité régulière dans la journée
+    \end{itemize}
+\end{itemize}
+
+\subsubsection{Algorithme de génération}
+
+La méthode \texttt{generate\_water\_data()} utilise une distribution gaussienne pour générer des valeurs réalistes :
+
+\begin{lstlisting}[language=Python, caption={Génération de données réalistes}]
+def generate_water_data(self) -> float:
+    current_hour = datetime.now().hour
+    
+    # Determiner le multiplicateur selon l'heure
+    if current_hour in PEAK_HOURS:
+        multiplier = PEAK_MULTIPLIER
+        base_mean = 20.0
+    elif current_hour in LOW_HOURS:
+        multiplier = LOW_MULTIPLIER
+        base_mean = 5.0
+    else:
+        multiplier = 1.0
+        base_mean = 12.0
+    
+    # Distribution gaussienne
+    std_dev = base_mean / 3
+    value = random.gauss(base_mean, std_dev) * multiplier
+    
+    # Variation aleatoire (+/-10%)
+    variation = random.uniform(0.9, 1.1)
+    value = value * variation
+    
+    # Limites de securite
+    value = max(MIN_CONSOMMATION, min(MAX_CONSOMMATION, value))
+    
+    return round(value, 2)
+\end{lstlisting}
+
+\subsection{Système d'alertes}
+
+Le simulateur génère des alertes intelligentes en fonction du contexte :
+
+\subsubsection{Types d'alertes}
+
+\begin{enumerate}
+    \item \textbf{SEUIL\_DEPASSE} : Consommation anormalement élevée
+    \begin{itemize}
+        \item Déclenchée quand la consommation dépasse 30L hors heures de pointe
+        \item Urgence : ÉLEVÉE (>45L) ou MOYENNE (30-45L)
+    \end{itemize}
+    
+    \item \textbf{FUITE\_DETECTEE} : Suspicion de fuite
+    \begin{itemize}
+        \item Déclenchée si consommation >40L ou >15L pendant les heures creuses
+        \item Urgence : ÉLEVÉE
+    \end{itemize}
+    
+    \item \textbf{CAPTEUR\_OFFLINE} : Problème de communication
+    \begin{itemize}
+        \item Probabilité : 5\% parmi les alertes générées
+        \item Urgence : MOYENNE
+    \end{itemize}
+\end{enumerate}
+
+\subsection{Découverte automatique des capteurs}
+
+Au démarrage, le simulateur interroge automatiquement le backend pour découvrir tous les capteurs IoT disponibles :
+
+\begin{lstlisting}[language=Python, caption={Découverte des capteurs}]
+def discover_capteurs(self) -> bool:
+    response = self.session.get(self.discovery_url, timeout=10)
+    
+    if response.status_code == 200:
+        self.capteur_ids = response.json()
+        print(f"Capteurs decouverts: {self.capteur_ids}")
+        return True
+    return False
+\end{lstlisting}
+
+Cette approche permet au simulateur de s'adapter automatiquement au nombre de capteurs présents dans la base de données sans configuration manuelle.
+
+\subsection{Communication avec le backend}
+
+Le simulateur communique avec deux endpoints REST :
+
+\begin{itemize}
+    \item \textbf{POST /api/waterdata} : Envoi des mesures de consommation
+    \begin{lstlisting}[language=json, caption={Format des données envoyées}]
+{
+    "capteurId": 1,
+    "valeurConsommation": 15.42
+}
+    \end{lstlisting}
+    
+    \item \textbf{POST /api/alertes} : Envoi des alertes détectées
+    \begin{lstlisting}[language=json, caption={Format des alertes}]
+{
+    "capteurId": 1,
+    "type": "FUITE_DETECTEE",
+    "message": "Suspicion de fuite: Consommation continue...",
+    "niveauUrgence": "ELEVEE"
+}
+    \end{lstlisting}
+\end{itemize}
+
+\subsection{Utilisation du simulateur}
+
+\subsubsection{Lancement avec configuration par défaut}
+
+\begin{lstlisting}[language=bash]
+python iot_simulator.py
+\end{lstlisting}
+
+\subsubsection{Lancement avec paramètres personnalisés}
+
+\begin{lstlisting}[language=bash]
+# URL personnalisee
+python iot_simulator.py --url http://192.168.1.10:8080/SmartWaterMonitoring
+
+# Intervalle de 5 secondes (tests)
+python iot_simulator.py --interval 5
+
+# URL et intervalle personnalises
+python iot_simulator.py --url http://exemple.com/app --interval 30
+\end{lstlisting}
+
+\subsection{Statistiques et monitoring}
+
+Le simulateur affiche des statistiques en temps réel :
+\begin{itemize}
+    \item Nombre total d'envois effectués
+    \item Taux de succès et d'erreurs
+    \item Nombre d'alertes générées
+    \item Indication de la période horaire (pointe/creuse/normale)
+\end{itemize}
+
+Exemple de sortie :
+\begin{verbatim}
+============================================================
+        Simulateur IoT Smart Water Monitoring
+============================================================
+Backend: http://localhost:8080/SmartWaterMonitoring
+Intervalle: 60 secondes
+============================================================
+
+Capteurs decouverts: [1, 2, 3, 4, 5]
+
+[14:23:45] Capteur #3: 18.42L envoye
+[14:24:45] Capteur #1: 22.15L envoye
+[14:24:45] ALERTE generee: SEUIL_DEPASSE - Capteur #1
+
+Statistiques: 50 envois | 49 reussis | 1 erreurs | 2 alertes
+14:25:30 - Heures de POINTE
+\end{verbatim}
+
+\section{Système d'Agrégation des Données}
+
+\subsection{Architecture de l'agrégation}
+
+Le système d'agrégation transforme les données brutes des capteurs (stockées dans \texttt{DonneeCapteur}) en historiques journaliers consolidés (table \texttt{HistoriqueConsommation}). Cette architecture à deux niveaux permet :
+
+\begin{itemize}
+    \item De conserver les données brutes pour analyse détaillée
+    \item De disposer d'agrégats optimisés pour l'affichage et les statistiques
+    \item De calculer automatiquement les coûts estimés
+\end{itemize}
+
+\subsection{Service d'agrégation - DataAggregationService}
+
+\subsubsection{Responsabilités}
+
+La classe \texttt{DataAggregationService} gère l'ensemble du processus d'agrégation :
+
+\begin{enumerate}
+    \item \textbf{Agrégation journalière} : Pour une date donnée, consolide toutes les mesures
+    \item \textbf{Calcul des métriques} : Volume total, consommation moyenne, coût estimé
+    \item \textbf{Rattrapage automatique} : Traite les journées manquantes
+    \item \textbf{Génération de statistiques} : Produit des analyses hebdomadaires et mensuelles
+\end{enumerate}
+
+\subsubsection{Algorithme d'agrégation par utilisateur}
+
+Pour chaque utilisateur et chaque journée :
+
+\begin{lstlisting}[language=Java, caption={Processus d'agrégation}]
+private boolean aggregerDonneesUtilisateur(
+    Utilisateur utilisateur, LocalDate date) {
+    
+    // 1. Verifier si l'historique existe deja
+    HistoriqueConsommation existant = 
+        chercherHistorique(utilisateur, date);
+    if (existant != null) return false;
+    
+    // 2. Definir les limites temporelles
+    LocalDateTime debut = date.atStartOfDay();      // 00:00:00
+    LocalDateTime fin = date.plusDays(1).atStartOfDay(); // 00:00:00 J+1
+    
+    // 3. Recuperer toutes les donnees capteur de la journee
+    List<DonneeCapteur> donnees = 
+        recupererDonnees(utilisateur, debut, fin);
+    
+    if (donnees.isEmpty()) return false;
+    
+    // 4. Calculer les agregats
+    double volumeTotal = donnees.stream()
+        .mapToDouble(DonneeCapteur::getValeurConsommation)
+        .sum();
+    
+    double consommationMoyenne = volumeTotal / 24.0;
+    double coutEstime = volumeTotal * PRIX_EAU_PAR_LITRE;
+    
+    // 5. Creer et persister l'historique
+    HistoriqueConsommation historique = new HistoriqueConsommation();
+    historique.setDate(date);
+    historique.setVolumeTotal(volumeTotal);
+    historique.setConsommationMoyenne(consommationMoyenne);
+    historique.setCoutEstime(coutEstime);
+    historique.setUtilisateur(utilisateur);
+    
+    session.persist(historique);
+    
+    return true;
+}
+\end{lstlisting}
+
+\subsubsection{Calcul du coût}
+
+Le coût estimé est calculé selon le tarif de l'eau :
+\begin{equation}
+\text{Coût} = \text{Volume (L)} \times \text{Prix (€/L)}
+\end{equation}
+
+Avec un prix par défaut de \textbf{0.00722 €/L} (environ 7.22 €/m³), correspondant au tarif moyen de l'eau en France.
+
+\subsection{Système de rattrapage automatique}
+
+\subsubsection{Détection des données manquantes}
+
+La méthode \texttt{aggregerDonneesManquantes()} analyse la base pour identifier les journées non agrégées :
+
+\begin{lstlisting}[language=Java, caption={Détection des journées manquantes}]
+public int aggregerDonneesManquantes() {
+    LocalDate hier = LocalDate.now().minusDays(1);
+    
+    // Trouver la plus ancienne mesure non agregee
+    LocalDateTime minHorodatage = session.createQuery(
+        "SELECT MIN(dc.horodatage) FROM DonneeCapteur dc " +
+        "WHERE dc.horodatage < :limite", LocalDateTime.class)
+        .setParameter("limite", hier.plusDays(1).atStartOfDay())
+        .uniqueResult();
+    
+    if (minHorodatage == null) return 0;
+    
+    LocalDate dateDebut = minHorodatage.toLocalDate();
+    
+    // Agreger toute la periode manquante
+    return aggregerPeriode(dateDebut, hier);
+}
+\end{lstlisting}
+
+Ce mécanisme garantit qu'aucune donnée ne reste non agrégée, même en cas de panne temporaire du système.
+
+\subsection{Planificateur automatique - DailyAggregationJob}
+
+\subsubsection{Architecture du job}
+
+Le \texttt{DailyAggregationJob} est un singleton qui utilise un \texttt{ScheduledExecutorService} pour exécuter l'agrégation automatiquement chaque jour.
+
+\subsubsection{Configuration}
+
+\begin{itemize}
+    \item \textbf{Heure d'exécution} : 00:30 (30 minutes après minuit)
+    \item \textbf{Fréquence} : Une fois par jour
+    \item \textbf{Mode} : Exécution en arrière-plan (thread dédié)
+\end{itemize}
+
+\subsubsection{Calcul du délai initial}
+
+Au démarrage, le job calcule le délai jusqu'à la prochaine exécution :
+
+\begin{lstlisting}[language=Java, caption={Calcul du délai}]
+private long calculerDelaiJusquaProchaineExecution() {
+    LocalDateTime maintenant = LocalDateTime.now();
+    LocalDateTime prochaineExecution = 
+        maintenant.toLocalDate().atTime(heureExecution);
+    
+    // Si l'heure est passee, planifier pour demain
+    if (maintenant.isAfter(prochaineExecution)) {
+        prochaineExecution = prochaineExecution.plusDays(1);
+    }
+    
+    return Duration.between(maintenant, prochaineExecution)
+                   .getSeconds();
+}
+\end{lstlisting}
+
+\subsubsection{Séquence d'exécution}
+
+À chaque exécution, le job effectue :
+
+\begin{enumerate}
+    \item \textbf{Agrégation des données capteurs}
+    \begin{itemize}
+        \item Traite la veille (J-1)
+        \item Effectue le rattrapage des jours manquants
+    \end{itemize}
+    
+    \item \textbf{Génération des statistiques}
+    \begin{itemize}
+        \item Calcule les moyennes hebdomadaires
+        \item Calcule les moyennes mensuelles
+        \item Identifie les tendances de consommation
+    \end{itemize}
+    
+    \item \textbf{Affichage des métriques}
+    \begin{itemize}
+        \item Nombre d'historiques créés
+        \item Nombre de statistiques générées
+        \item État global du système
+    \end{itemize}
+\end{enumerate}
+
+\subsubsection{Logs d'exécution}
+
+Exemple de sortie lors de l'exécution automatique :
+
+\begin{verbatim}
+=======================================================
+DEBUT DE L'AGREGATION AUTOMATIQUE - 2025-11-14T00:30:00
+=======================================================
+
+Demarrage du rattrapage automatique jusqu'a : 2025-11-13
+Rattrapage : agregation de 2025-11-10 a 2025-11-13
+
+--- Traitement du 2025-11-10 ---
+Agregation pour Jean Dupont - 2025-11-10
+15 mesures trouvees
+Historique cree : 245.5L, 1.77€
+
+Agregation terminee : 4 historiques crees
+
+Generation des statistiques journalieres...
+5 statistiques generees pour la veille
+
+Statistiques globales :
+   - Total historiques : 156
+   - Donnees non agregees : 0
+   - Derniere date agregee : 2025-11-13
+
+=======================================================
+FIN DE L'AGREGATION AUTOMATIQUE - 2025-11-14T00:30:15
+Prochaine execution : demain a 00:30
+=======================================================
+\end{verbatim}
+
+\subsection{Initialisation au démarrage}
+
+Le job est initialisé automatiquement au démarrage de l'application via l'\texttt{ApplicationStartupListener} :
+
+\begin{lstlisting}[language=Java, caption={Initialisation automatique}]
+@WebListener
+public class ApplicationStartupListener 
+    implements ServletContextListener {
+    
+    @Override
+    public void contextInitialized(ServletContextEvent sce) {
+        System.out.println("Demarrage de l'application...");
+        
+        // Demarrer le job d'agregation
+        DailyAggregationJob job = DailyAggregationJob.getInstance();
+        job.start();
+        
+        System.out.println("Application prete");
+    }
+}
+\end{lstlisting}
+
+\subsection{Tests et validation}
+
+\subsubsection{Test manuel}
+
+Pour tester l'agrégation sans attendre l'exécution automatique :
+
+\begin{lstlisting}[language=Java, caption={Exécution manuelle pour tests}]
+// Dans un servlet ou une classe de test
+DailyAggregationJob job = DailyAggregationJob.getInstance();
+job.executerMaintenant();
+\end{lstlisting}
+
+\subsubsection{Métriques de performance}
+
+Sur un ensemble de test avec 5 utilisateurs et 1000 mesures par jour :
+\begin{itemize}
+    \item Temps d'agrégation d'une journée : $\sim$2 secondes
+    \item Temps de rattrapage de 7 jours : $\sim$15 secondes
+    \item Génération de statistiques : $\sim$1 seconde
+\end{itemize}
+
+\section{Intégration globale}
+
+\subsection{Flux de données complet}
+
+\begin{enumerate}
+    \item \textbf{Génération} : Le simulateur Python envoie des mesures toutes les minutes
+    \item \textbf{Réception} : Le servlet \texttt{DataApiServlet} reçoit et valide les données
+    \item \textbf{Stockage} : Les mesures sont persistées dans \texttt{DonneeCapteur}
+    \item \textbf{Agrégation} : Chaque nuit à 00:30, le job consolide les données
+    \item \textbf{Historiques} : Les agrégats sont stockés dans \texttt{HistoriqueConsommation}
+    \item \textbf{Statistiques} : Des analyses sont générées pour l'affichage
+    \item \textbf{Visualisation} : Les utilisateurs consultent leurs données via les dashboards
+\end{enumerate}
+
+\subsection{Avantages de cette architecture}
+
+\begin{itemize}
+    \item \textbf{Scalabilité} : Les agrégats évitent de requêter des milliers de mesures
+    \item \textbf{Performance} : Les requêtes sur historiques sont très rapides
+    \item \textbf{Fiabilité} : Le rattrapage automatique garantit la cohérence
+    \item \textbf{Flexibilité} : Les données brutes restent accessibles pour analyses détaillées
+    \item \textbf{Testabilité} : Le simulateur permet de générer des données réalistes
+\end{itemize}
+
+\subsection{Évolutions possibles}
+
+\begin{itemize}
+    \item Agrégation en temps réel (en plus de la journalière)
+    \item Détection d'anomalies par machine learning
+    \item Alertes prédictives basées sur les tendances
+    \item Agrégation multi-niveaux (horaire, journalière, mensuelle)
+    \item Export des données pour analyses externes
+\end{itemize}
