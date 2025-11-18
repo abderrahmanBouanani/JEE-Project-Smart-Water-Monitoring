@@ -111,4 +111,23 @@ public class AlerteDao extends AbstractDao<Alerte> {
         }
         return list != null ? list : new java.util.ArrayList<>();
     }
+
+    public long countUnread() {
+        Session session = null;
+        Transaction tx = null;
+        long count = 0;
+        try {
+            session = HibernateUtil.getSessionFactory().openSession();
+            tx = session.beginTransaction();
+            count = (Long) session.createQuery("SELECT COUNT(a) FROM Alerte a WHERE a.estLue = false")
+                    .uniqueResult();
+            tx.commit();
+        } catch (HibernateException e) {
+            if (tx != null) tx.rollback();
+            e.printStackTrace();
+        } finally {
+            if (session != null) session.close();
+        }
+        return count;
+    }
 }

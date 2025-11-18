@@ -53,7 +53,7 @@ public class AuthServlet extends HttpServlet {
             // Redirection en fonction du rôle
             if (utilisateur.getType() == TypeUtilisateur.ADMINISTRATEUR) {
                 System.out.println("Redirection vers page ADMIN");
-                response.sendRedirect(request.getContextPath() + "/index.jsp");
+                response.sendRedirect(request.getContextPath() + "/adminDashboard");
             } else if (utilisateur.getType() == TypeUtilisateur.CITOYEN) {
                 System.out.println("Redirection vers page CITOYEN");
                 response.sendRedirect(request.getContextPath() + "/dashboard");

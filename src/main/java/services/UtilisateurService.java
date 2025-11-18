@@ -2,6 +2,7 @@ package services;
 
 import dao.UtilisateurDao;
 import model.Utilisateur;
+import model.TypeUtilisateur;
 
 import java.util.List;
 
@@ -37,5 +38,13 @@ public class UtilisateurService implements IService<Utilisateur> {
     // Nouvelle méthode pour l'authentification
     public Utilisateur findByEmail(String email) {
         return utilisateurDao.findByEmail(email);
+    }
+
+    public long countAll() {
+        return utilisateurDao.countAll();
+    }
+
+    public long countByType(TypeUtilisateur type) {
+        return utilisateurDao.countByType(type);
     }
 }

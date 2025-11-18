@@ -46,4 +46,12 @@ public class CapteurIoTService implements IService<CapteurIoT> {
         List<CapteurIoT> capteurs = findByUserId(userId);
         return capteurs.size();
     }
+
+    public long countAll() {
+        return capteurIoTDao.countAll();
+    }
+
+    public long countByStatus(boolean etat) {
+        return capteurIoTDao.countByStatus(etat);
+    }
 }

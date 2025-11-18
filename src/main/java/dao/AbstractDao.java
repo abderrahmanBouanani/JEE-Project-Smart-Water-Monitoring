@@ -117,6 +117,24 @@ public abstract class AbstractDao<T> implements IDao<T> {
         return list;
     }
 
+    public long countAll() {
+        Session session = null;
+        Transaction tx = null;
+        long count = 0;
+        try {
+            session = HibernateUtil.getSessionFactory().openSession();
+            tx = session.beginTransaction();
+            count = (Long) session.createQuery("SELECT COUNT(e) FROM " + entityClass.getSimpleName() + " e").uniqueResult();
+            tx.commit();
+        } catch (HibernateException e) {
+            if (tx != null) tx.rollback();
+            e.printStackTrace();
+        } finally {
+            if (session != null) session.close();
+        }
+        return count;
+    }
+
     @FunctionalInterface
     private interface HibernateOperation<T> {
         void execute(Session session);

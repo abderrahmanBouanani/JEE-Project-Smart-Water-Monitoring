@@ -127,4 +127,24 @@ public class CapteurIoTDao extends AbstractDao<CapteurIoT> {
         }
         return count != null ? count : 0L;
     }
+
+    public long countByStatus(boolean etat) {
+        Session session = null;
+        Transaction tx = null;
+        long count = 0;
+        try {
+            session = HibernateUtil.getSessionFactory().openSession();
+            tx = session.beginTransaction();
+            count = (Long) session.createQuery("SELECT COUNT(c) FROM CapteurIoT c WHERE c.etat = :etat")
+                    .setParameter("etat", etat)
+                    .uniqueResult();
+            tx.commit();
+        } catch (HibernateException e) {
+            if (tx != null) tx.rollback();
+            e.printStackTrace();
+        } finally {
+            if (session != null) session.close();
+        }
+        return count;
+    }
 }

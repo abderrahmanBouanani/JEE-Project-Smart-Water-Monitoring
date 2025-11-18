@@ -46,6 +46,14 @@ public class AlerteService implements IService<Alerte> {
         return alerteDao.findUnreadByUserId(userId).size();
     }
 
+    public long countAll() {
+        return alerteDao.countAll();
+    }
+
+    public long countUnread() {
+        return alerteDao.countUnread();
+    }
+
     public boolean marquerCommeLue(Long alerteId, Long userId) {
         Alerte alerte = findById(alerteId);
         // Vérifier que l'alerte appartient bien à l'utilisateur

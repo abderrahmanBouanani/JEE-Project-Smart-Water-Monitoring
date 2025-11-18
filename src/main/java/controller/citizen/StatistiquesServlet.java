@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpSession;
 import model.Statistique;
 import model.Utilisateur;
 import services.StatistiqueService;
+import services.DonneeCapteurService;
 import java.io.IOException;
 import java.util.List;
 
@@ -17,6 +18,7 @@ import java.util.List;
 public class StatistiquesServlet extends HttpServlet {
 
     private final StatistiqueService statistiqueService = new StatistiqueService();
+    private final DonneeCapteurService donneeCapteurService = new DonneeCapteurService();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -49,18 +51,13 @@ public class StatistiquesServlet extends HttpServlet {
             Double consommationMoyenne = statistiqueService.getConsommationMoyenneByUserId(user.getIdUtilisateur());
             Double consommationTotale = statistiqueService.getConsommationTotaleByUserId(user.getIdUtilisateur());
 
-            // Données simulées pour les graphiques (à remplacer par de vraies données)
-            // Pour l'instant, on utilise des données de test si pas de données réelles
-            double[] donneesQuotidiennes = {12.5, 19.2, 8.7, 15.3, 12.8, 18.6, 14.1};
-            double[] donneesMensuelles = {450, 420, 380, 350, 320, 300};
-            double[] donneesMoyennes = {15.2, 350, 4200};
+            // ✅ RÉCUPÉRER LES VRAIES DONNÉES DE CONSOMMATION
+            System.out.println("📊 Récupération des données de consommation réelles...");
+            List<Double> donneesQuotidiennes = donneeCapteurService.getDailyConsumptionLast7Days(user.getIdUtilisateur());
+            List<Double> donneesMensuelles = donneeCapteurService.getMonthlyConsumptionLast6Months(user.getIdUtilisateur());
 
-            if (consommationMoyenne != null) {
-                donneesMoyennes[0] = consommationMoyenne;
-            }
-            if (consommationTotale != null) {
-                donneesMoyennes[2] = consommationTotale;
-            }
+            System.out.println("✅ Données quotidiennes (7 jours): " + donneesQuotidiennes);
+            System.out.println("✅ Données mensuelles (6 mois): " + donneesMensuelles);
 
             // ENVOYER LES DONNÉES À LA JSP
             request.setAttribute("statistiques", statistiques);
@@ -68,10 +65,9 @@ public class StatistiquesServlet extends HttpServlet {
             request.setAttribute("consommationMoyenne", consommationMoyenne);
             request.setAttribute("consommationTotale", consommationTotale);
 
-            // Données pour les graphiques
+            // Données RÉELLES pour les graphiques
             request.setAttribute("donneesQuotidiennes", donneesQuotidiennes);
             request.setAttribute("donneesMensuelles", donneesMensuelles);
-            request.setAttribute("donneesMoyennes", donneesMoyennes);
 
             System.out.println("🚀 Forward vers la JSP...");
 

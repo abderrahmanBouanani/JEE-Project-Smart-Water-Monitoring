@@ -164,6 +164,19 @@
                 </h4>
 
                 <div class="row">
+                    <!-- Statistiques Admin -->
+                    <div class="col-md-6 col-lg-4">
+                        <a href="${pageContext.request.contextPath}/adminStatistiques" class="management-card">
+                            <div class="card-icon bg-primary bg-opacity-10 text-primary">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <h5 class="fw-bold mb-2">Statistiques</h5>
+                            <p class="text-muted mb-0 small">
+                                Vue d'ensemble et statistiques du système
+                            </p>
+                        </a>
+                    </div>
+
                     <!-- Gestion des Alertes -->
                     <div class="col-md-6 col-lg-4">
                         <a href="${pageContext.request.contextPath}/alertes" class="management-card">
@@ -199,19 +212,6 @@
                             <h5 class="fw-bold mb-2">Gérer les Capteurs IoT</h5>
                             <p class="text-muted mb-0 small">
                                 Configuration des capteurs connectés
-                            </p>
-                        </a>
-                    </div>
-
-                    <!-- Agrégation des Données -->
-                    <div class="col-md-6 col-lg-4">
-                        <a href="${pageContext.request.contextPath}/admin/aggregation" class="management-card">
-                            <div class="card-icon bg-primary bg-opacity-10 text-primary">
-                                <i class="fas fa-database"></i>
-                            </div>
-                            <h5 class="fw-bold mb-2">Agrégation des Données</h5>
-                            <p class="text-muted mb-0 small">
-                                Gestion de l'agrégation automatique
                             </p>
                         </a>
                     </div>
