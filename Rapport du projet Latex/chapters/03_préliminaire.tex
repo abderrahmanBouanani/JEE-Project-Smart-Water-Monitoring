@@ -252,10 +252,11 @@ ANOMALIE & Absence de données pendant 10 minutes & MOYENNE \\ \hline
 
 Le tableau \ref{tab:flux_donnees} décrit les flux de données clés du système.
 
-\begin{table}[ht]
+\begin{table}[H]
 \centering
 \caption{Flux de données principaux du système Smart Water Monitoring.}
 \label{tab:flux_donnees}
+\footnotesize
 \begin{tabular}{|l|l|l|l|}
 \hline
 \textbf{Flux} & \textbf{Source} & \textbf{Destination} & \textbf{Fréquence} \\ \hline
@@ -271,7 +272,7 @@ Rapports administrateur & \texttt{Statistique} & Dashboard admin & On-demand \\ 
 
 La figure \ref{fig:use_cases} présente le diagramme UML des cas d'utilisation du système.
 
-\begin{figure}[ht]
+\begin{figure}[H]
     \centering
     \includegraphics[width=0.9\linewidth]{figures/use_cases.png}
     \caption{Diagramme UML des cas d'utilisation : Smart Water Monitoring System montrant les interactions entre les acteurs Citoyen, Administrateur et le système.}
@@ -288,36 +289,4 @@ Les deux profils d'utilisateurs (Citoyen et Administrateur) permettent une distr
 
 Les contraintes technologiques et de sécurité (Jakarta EE, Hibernate, MySQL, BCrypt, RBAC) définissent le périmètre de l'implémentation. Le chapitre suivant approfondira l'analyse de l'architecture technique, présentera l'état de l'art des solutions similaires et détaillera les choix de conception du système.
 
-\section{Processus métier (si nécessaire)}
-Dans certains projets, il peut être pertinent de détailler le \textbf{workflow global} (suite 
-d’étapes) sous forme de \textbf{diagramme BPMN} ou de \textbf{diagramme d’activités UML}. 
 
-\begin{itemize}
-    \item \textbf{Décrire le flux d’informations :}  
-    Illustrer l’enchaînement des opérations (par exemple, traitement d’une demande, validation 
-    par un chef d’équipe, notification à un utilisateur, etc.).
-    \item \textbf{Validations et étapes-clés :}  
-    S’il y a lieu de valider un document, de signer un contrat, de changer l’état d’une commande, 
-    etc., il faut expliciter ces jalons importants (qui valide ? comment ?).
-\end{itemize}
-La figure \ref{fig:bpmn} présente un exemple d'un diagramme BPMN.
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.9\linewidth]{figures/bpmn_example.png}
-    \caption{BPMN Diagramme Processus Métier - Exemple Prêt de Livres. }
-    \label{fig:bpmn}
-\end{figure}
-\section{Conclusion}
-Pour conclure, il est important de dresser un bilan synthétique de l’étude fonctionnelle et 
-préliminaire, afin de clarifier les points suivants :
-
-\begin{itemize}
-    \item \textbf{Résumé de la vision fonctionnelle :}  
-    Rappeler brièvement les grandes fonctionnalités prévues, les rôles et responsabilités 
-    des acteurs, et les contraintes majeures (performance, sécurité, etc.).
-    
-    \item \textbf{Transition vers l’état de l’art ou travaux préexistants :}  
-    Le chapitre suivant, souvent consacré à la \textit{revue de littérature} ou à l’étude 
-    de l’existant, permettra de confronter ces besoins avec les solutions ou approches déjà 
-    disponibles, et d’affiner la pertinence du choix technique qui sera opéré.
-\end{itemize}

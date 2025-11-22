@@ -45,26 +45,26 @@ Le code est organisé en packages selon les responsabilités :
 
 \begin{verbatim}
 src/
-├── main/
-│   ├── java/
-│   │   ├── controller/          # Gestion des requêtes HTTP
-│   │   ├── dao/                 # Accès aux données
-│   │   ├── filter/              # Filtres de sécurité
-│   │   ├── model/               # Entités métier
-│   │   ├── services/            # Logique métier
-│   │   └── jobs/                # Tâches planifiées
-│   ├── resources/
-│   │   └── META-INF/
-│   │       └── persistence.xml  # Configuration base de données
-│   └── webapp/
-│       ├── WEB-INF/
-│       │   └── web.xml          # Configuration déploiement
-│       ├── views/               # Pages d'interface
-│       ├── login.jsp
-│       ├── signup.jsp
-│       └── index.jsp
-└── test/
-    └── java/                    # Tests unitaires
+  main/
+    java/
+      controller/          # Gestion des requêtes HTTP
+      dao/                 # Accès aux données
+      filter/              # Filtres de sécurité
+      model/               # Entités métier
+      services/            # Logique métier
+      jobs/                # Tâches planifiées
+    resources/
+      META-INF/
+        persistence.xml    # Configuration base de données
+    webapp/
+      WEB-INF/
+        web.xml            # Configuration déploiement
+      views/               # Pages d'interface
+      login.jsp
+      signup.jsp
+      index.jsp
+  test/
+    java/                  # Tests unitaires
 \end{verbatim}
 \subsection{Interfaces utilisateur}
 
@@ -93,7 +93,7 @@ L'interface administrateur comprend :
 \begin{itemize}
     \item Supervision globale du système
     \item Gestion des utilisateurs et capteurs
-    \tableau de bord avec statistiques agrégées
+    \item Tableau de bord avec statistiques agrégées
     \item Rapports et analyses
 \end{itemize}
 

@@ -140,7 +140,7 @@ Le simulateur communique avec deux endpoints REST :
 
 \begin{itemize}
     \item \textbf{POST /api/waterdata} : Envoi des mesures de consommation
-    \begin{lstlisting}[language=json, caption={Format des données envoyées}]
+    \begin{lstlisting}[language=Java, caption={Format des données envoyées}]
 {
     "capteurId": 1,
     "valeurConsommation": 15.42
@@ -148,7 +148,7 @@ Le simulateur communique avec deux endpoints REST :
     \end{lstlisting}
     
     \item \textbf{POST /api/alertes} : Envoi des alertes détectées
-    \begin{lstlisting}[language=json, caption={Format des alertes}]
+    \begin{lstlisting}[language=Java, caption={Format des alertes}]
 {
     "capteurId": 1,
     "type": "FUITE_DETECTEE",
