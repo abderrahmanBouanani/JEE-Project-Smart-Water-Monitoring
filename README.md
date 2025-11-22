@@ -152,10 +152,6 @@ Ou déployez via votre IDE (IntelliJ IDEA, Eclipse).
 http://localhost:8080/SmartWaterMonitoring
 ```
 
-**Comptes par défaut** :
-- **Admin** : admin@ensaa.ma / admin123
-- **Citoyen** : user@ensaa.ma / user123
-
 ## ⚙️ Configuration
 
 ### Base de données
@@ -343,7 +339,7 @@ Ce projet est développé dans un cadre académique pour le module JEE à l'ENSA
 ## 📞 Contact
 
 Pour toute question ou suggestion :
-- 📧 Email : abderrahman.bouanani@edu.uiz.ac.ma
+- 📧 Email : a.bouanani2566@uca.ac.ma
 - 🎓 Institution : ENSA Agadir
 
 ---
